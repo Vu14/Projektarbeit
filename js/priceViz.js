@@ -161,30 +161,41 @@ function createBoxPlot(svg, data, width, height) {
 }
 
 function createHistogram(svg, data, width, height) {
+    // Dynamisch Min und Max Preis ermitteln
+    const minPrice = d3.min(data, d => d.realSum);
+    const maxPrice = d3.max(data, d => d.realSum);
+    
+    // Anzahl der Bins basierend auf der Datenmenge anpassen
+    const binCount = Math.floor(Math.sqrt(data.length)); // Wurzel-N Regel für Bins
+    
     // Create histogram bins
     const histogram = d3.histogram()
         .value(d => d.realSum)
-        .domain([0, d3.max(data, d => d.realSum)])
-        .thresholds(30);
+        .domain([minPrice, maxPrice])
+        .thresholds(binCount);
 
     const bins = histogram(data);
 
-    // Scales
+    // Scales mit dynamischem Domain
     const x = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.realSum)])
+        .domain([minPrice, maxPrice])
         .range([0, width]);
 
     const y = d3.scaleLinear()
         .domain([0, d3.max(bins, d => d.length)])
+        .nice() // Rundet die Domain auf "schöne" Werte
         .range([height, 0]);
 
-    // Add axes
+    // Add axes with formatted ticks
     svg.append("g")
         .attr("transform", `translate(0,${height})`)
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x)
+            .ticks(10)
+            .tickFormat(d => `${d}€`));
 
     svg.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y)
+            .ticks(10));
 
     // Add axis labels
     svg.append("text")
@@ -197,19 +208,92 @@ function createHistogram(svg, data, width, height) {
         .attr("y", -60)
         .attr("x", -(height/2))
         .style("text-anchor", "middle")
-        .text("Frequency");
+        .text("Number of Listings");
 
-    // Add bars
+    // Tooltip div
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
+
+    // Add bars with interaction
     svg.selectAll("rect")
         .data(bins)
         .enter()
         .append("rect")
         .attr("x", d => x(d.x0))
         .attr("y", d => y(d.length))
-        .attr("width", d => x(d.x1) - x(d.x0))
+        .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1)) // -1 für Abstand zwischen Bars
         .attr("height", d => height - y(d.length))
         .style("fill", "#69b3a2")
-        .style("opacity", 0.8);
+        .style("opacity", 0.8)
+        // Interaktive Features
+        .on("mouseover", function(event, d) {
+            d3.select(this)
+                .style("opacity", 1);
+            
+            tooltip.transition()
+                .duration(200)
+                .style("opacity", .9);
+                
+            tooltip.html(`Price Range: ${d.x0.toFixed(0)}€ - ${d.x1.toFixed(0)}€<br/>
+                         Count: ${d.length} listings`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 28) + "px");
+        })
+        .on("mouseout", function() {
+            d3.select(this)
+                .style("opacity", 0.8);
+                
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
+
+    // Add mean line
+    const meanPrice = d3.mean(data, d => d.realSum);
+    svg.append("line")
+        .attr("x1", x(meanPrice))
+        .attr("x2", x(meanPrice))
+        .attr("y1", height)
+        .attr("y2", 0)
+        .style("stroke", "red")
+        .style("stroke-dasharray", "4")
+        .style("stroke-width", 2);
+
+    // Add mean label
+    svg.append("text")
+        .attr("x", x(meanPrice))
+        .attr("y", 0)
+        .attr("dy", -5)
+        .attr("text-anchor", "middle")
+        .style("fill", "red")
+        .text(`Mean: ${meanPrice.toFixed(0)}€`);
+
+    // Füge Statistik-Box hinzu
+    const stats = svg.append("g")
+        .attr("class", "stats")
+        .attr("transform", `translate(${width - 160}, 20)`);
+
+    stats.append("rect")
+        .attr("width", 150)
+        .attr("height", 80)
+        .attr("fill", "white")
+        .attr("stroke", "#ccc");
+
+    stats.append("text")
+        .attr("x", 10)
+        .attr("y", 20)
+        .text(`Min: ${minPrice.toFixed(0)}€`);
+
+    stats.append("text")
+        .attr("x", 10)
+        .attr("y", 40)
+        .text(`Max: ${maxPrice.toFixed(0)}€`);
+
+    stats.append("text")
+        .attr("x", 10)
+        .attr("y", 60)
+        .text(`Median: ${d3.median(data, d => d.realSum).toFixed(0)}€`);
 }
 
 function updatePriceVisualization(data) {
