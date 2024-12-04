@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AirBnB Analysis Dashboard</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div id="dashboard">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>AirBnB European Cities Analysis</h1>
+            <p>Analyse pricing and satisfaction patterns across major European cities</p>
+        </div>
+
+        <!-- Global Controls -->
+        <div class="controls">
+            <!-- Time Period Selection -->
+            <div class="control-group">
+                <label for="timeSelect">Time Period:</label>
+                <select id="timeSelect">
+                    <option value="weekday">Weekday</option>
+                    <option value="weekend">Weekend</option>
+                </select>
+            </div>
+
+            <!-- City Selection -->
+            <div class="control-group">
+                <label for="citySelect">Cities:</label>
+                <select id="citySelect" multiple>
+                    <option value="amsterdam">Amsterdam</option>
+                    <option value="athens">Athens</option>
+                    <option value="barcelona">Barcelona</option>
+                    <option value="berlin">Berlin</option>
+                    <option value="budapest">Budapest</option>
+                    <option value="lisbon">Lisbon</option>
+                    <option value="london">London</option>
+                    <option value="paris">Paris</option>
+                    <option value="rome">Rome</option>
+                    <option value="vienna">Vienna</option>
+                </select>
+            </div>
+
+            <!-- Price Range -->
+            <div class="control-group">
+                <label for="priceRange">Price Range:</label>
+                <input type="range" id="priceRange" min="0" max="1000" step="50">
+                <span id="priceValue">500€</span>
+            </div>
+        </div>
+
+        <!-- Visualization Grid -->
+        <div class="viz-grid">
+            <!-- Price Distribution Visualization -->
+            <div class="viz-container">
+                <h2 class="viz-title">Price Distribution</h2>
+                <div id="priceViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+
+            <!-- Geographic Distribution -->
+            <div class="viz-container">
+                <h2 class="viz-title">Geographic Distribution</h2>
+                <div id="geoViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+
+            <!-- Satisfaction Analysis -->
+            <div class="viz-container">
+                <h2 class="viz-title">Satisfaction Analysis</h2>
+                <div id="satisfactionViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+
+            <!-- Distance vs Price -->
+            <div class="viz-container">
+                <h2 class="viz-title">Distance vs Price Analysis</h2>
+                <div id="distanceViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/dataLoader.js"></script>
+    <script src="js/priceViz.js"></script>
+    <script src="js/geoViz.js"></script>
+    <script src="js/satisfactionViz.js"></script>
+    <script src="js/distanceViz.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
