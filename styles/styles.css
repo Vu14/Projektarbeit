@@ -121,3 +121,8 @@ select:hover, button:hover {
         width: 100%;
     }
 }
+
+#geoViz {
+    height: 400px;
+    width: 100%;
+}
