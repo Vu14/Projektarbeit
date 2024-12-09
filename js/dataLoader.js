@@ -6,32 +6,27 @@ async function loadData() {
             'rome', 'vienna'
         ];
         
-        const period = state.timePeriod; // 'weekday' or 'weekend'
+        const period = state.timePeriod;
         
         // Load data for all cities
         const datasets = await Promise.all(
-            cities.map(city => 
-                d3.csv(`data/${city}_${period}s.csv`)
-            )
+            cities.map(async city => {
+                const filename = `${city}_${period}s.csv`;
+                const response = await fetch(`data/${filename}`);
+                const text = await response.text();
+                const data = d3.csvParse(text);
+                // Add filename to each row
+                return data.map(row => ({...row, _filename: filename}));
+            })
         );
         
-        // Combine and process datasets
-        const combinedData = datasets.flat().map(d => ({
-            ...d,
-            realSum: +d.realSum,
-            person_capacity: +d.person_capacity,
-            cleanliness_rating: +d.cleanliness_rating,
-            guest_satisfaction_overall: +d.guest_satisfaction_overall,
-            bedrooms: +d.bedrooms,
-            dist: +d.dist,
-            metro_dist: +d.metro_dist,
-            lng: +d.lng,
-            lat: +d.lat
-        }));
-
+        // Combine all datasets
+        const combinedData = datasets.flat();
+        
+        // Store in state
         state.currentData = combinedData;
+        
         return combinedData;
-
     } catch (error) {
         console.error('Error loading data:', error);
         throw error;
