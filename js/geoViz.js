@@ -53,6 +53,7 @@ function createGeoVisualization(data) {
         .style('margin', '10px')
         .style('padding', '5px')
         .on('change', function() {
+            selectedCity = this.value;
             updateVisualization(this.value, selectedPeriod);
         });
 
@@ -245,5 +246,5 @@ function createGeoVisualization(data) {
     }
 
     // Initial visualization with Berlin and Weekday
-    updateVisualization('berlin', 'weekday');
+   // updateVisualization('berlin', 'weekday');
 }
