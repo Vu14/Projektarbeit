@@ -246,5 +246,5 @@ function createGeoVisualization(data) {
     }
 
     // Initial visualization with Berlin and Weekday
-   // updateVisualization('berlin', 'weekday');
+   updateVisualization('berlin', 'weekday');
 }
