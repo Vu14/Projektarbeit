@@ -27,26 +27,6 @@ function initializeVisualizations(data) {
     createDistanceVisualization(data);
 }
 
-function setupEventListeners() {
-    // Time period selection
-    document.getElementById('timeSelect').addEventListener('change', async (e) => {
-        const newData = await updateDataForTimePeriod(e.target.value);
-        updateAllVisualizations(newData);
-    });
-
-    // City selection
-    document.getElementById('citySelect').addEventListener('change', (e) => {
-        const selectedCities = Array.from(e.target.selectedOptions).map(option => option.value);
-        filterDataByCities(selectedCities);
-    });
-
-    // Price range
-    document.getElementById('priceRange').addEventListener('input', (e) => {
-        document.getElementById('priceValue').textContent = `${e.target.value}€`;
-        filterDataByPrice(e.target.value);
-    });
-}
-
 function updateAllVisualizations(data) {
     updatePriceVisualization(data);
     updateGeoVisualization(data);

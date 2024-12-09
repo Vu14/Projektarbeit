@@ -6,24 +6,41 @@ async function loadData() {
             'rome', 'vienna'
         ];
         
-        const period = state.timePeriod;
+        // Mögliche Zeiträume, hier nehmen wir an, dass es 'weekday' und 'weekend' gibt, aber es können auch weitere existieren
+        const periods = ['weekday', 'weekend']; // Falls du weitere Perioden hast, kannst du sie hier hinzufügen
         
-        // Load data for all cities
+        // Lade Daten für alle Städte und alle Perioden
         const datasets = await Promise.all(
             cities.map(async city => {
-                const filename = `${city}_${period}s.csv`;
-                const response = await fetch(`data/${filename}`);
-                const text = await response.text();
-                const data = d3.csvParse(text);
-                // Add filename to each row
-                return data.map(row => ({...row, _filename: filename}));
+                // Lade alle Perioden für jede Stadt
+                const cityData = await Promise.all(
+                    periods.map(async period => {
+                        const filename = `${city}_${period}s.csv`; // Beachte das S für Wochenenddateien
+                        const response = await fetch(`data/${filename}`);
+                        
+                        // Wenn die Datei nicht existiert, überspringe sie
+                        if (!response.ok) {
+                            console.warn(`Datei für ${city} im Zeitraum ${period} konnte nicht geladen werden.`);
+                            return []; // Rückgabe eines leeren Arrays, wenn die Datei nicht existiert
+                        }
+
+                        const text = await response.text();
+                        const data = d3.csvParse(text);
+
+                        // Füge den Dateinamen zu jedem Datensatz hinzu
+                        return data.map(row => ({...row, _filename: filename}));
+                    })
+                );
+
+                // Kombiniere die Daten aus allen Perioden für diese Stadt
+                return cityData.flat(); // `flat()` kombiniert alle Perioden für eine Stadt
             })
         );
         
-        // Combine all datasets
+        // Kombiniere alle Datensätze aus allen Städten
         const combinedData = datasets.flat();
         
-        // Store in state
+        // Speichere die kombinierten Daten im Zustand
         state.currentData = combinedData;
         
         return combinedData;
@@ -33,7 +50,10 @@ async function loadData() {
     }
 }
 
+
+
 async function updateDataForTimePeriod(period) {
+
     state.timePeriod = period;
     return await loadData();
 }
