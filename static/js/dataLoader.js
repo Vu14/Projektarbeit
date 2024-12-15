@@ -56,23 +56,4 @@ function filterDataByPrice(maxPrice) {
     updateAllVisualizations(filteredData);
 }
 
-// Optional: Funktion zum Laden der verfügbaren Städte
-async function loadCities() {
-    try {
-        const response = await fetch('/api/cities');
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const cities = await response.json();
-        
-        // Populate city select
-        const citySelect = document.getElementById('citySelect');
-        citySelect.innerHTML = cities
-            .map(city => `<option value="${city}">${city.charAt(0).toUpperCase() + city.slice(1)}</option>`)
-            .join('');
-            
-    } catch (error) {
-        console.error('Error loading cities:', error);
-    }
-}
+
