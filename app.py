@@ -25,12 +25,12 @@ def get_data(city, period):
             return jsonify({'error': 'Invalid city or period'}), 400
 
         # Konstruiere den Dateinamen
-        filename = f"{city}_{period}s.csv"  # Beachte das 's' am Ende
+        filename = f"{city}_{period}s.csv"  
         filepath = os.path.join(DATA_DIR, filename)
         
         # Überprüfe ob die Datei existiert
         if not os.path.exists(filepath):
-            print(f"File not found: {filepath}")  # Debug-Ausgabe
+            print(f"File not found: {filepath}") 
             return jsonify({'error': f'File not found: {filename}'}), 404
         
         # Lade die CSV-Datei
