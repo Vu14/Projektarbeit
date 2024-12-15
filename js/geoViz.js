@@ -1,5 +1,6 @@
+let geoVizContext = null;
+
 function createGeoVisualization(data) {
-    // Stadtconfig bleibt gleich
     const cityConfig = {
         'berlin': {
             center: [52.52, 13.405],
@@ -43,78 +44,34 @@ function createGeoVisualization(data) {
         }
     };
 
-    // Container erstellen
+    // Container setup
     const container = d3.select('#geoViz')
         .classed('loading', false)
         .html('');
 
-    // Controls Container für die Dropdowns
-    const controlsDiv = container.append('div')
-        .attr('class', 'controls');
-
-    // Control Groups für die Dropdowns
-    const cityControl = controlsDiv.append('div')
-        .attr('class', 'control-group');
-    
-    cityControl.append('label')
-        .text('City:');
-
-    const selectorCity = cityControl.append('select')
-        .on('change', function() {
-            selectedCity = this.value;
-            updateVisualization(this.value, selectedPeriod);
-        });
-
-    selectorCity.selectAll('option')
-        .data(Object.keys(cityConfig))
-        .enter()
-        .append('option')
-        .text(d => d.charAt(0).toUpperCase() + d.slice(1))
-        .attr('value', d => d);
-
-    const periodControl = controlsDiv.append('div')
-        .attr('class', 'control-group');
-    
-    periodControl.append('label')
-        .text('Period:');
-
-    const selectorPeriod = periodControl.append('select')
-        .on('change', function() {
-            selectedPeriod = this.value;
-            updateVisualization(selectedCity, selectedPeriod);
-        });
-
-    selectorPeriod.selectAll('option')
-        .data(['weekday', 'weekend'])
-        .enter()
-        .append('option')
-        .text(d => d.charAt(0).toUpperCase() + d.slice(1))
-        .attr('value', d => d);
-
-    // Map Container mit angepasster Höhe
+    // Map Container
     const mapContainer = container.append('div')
         .attr('id', 'map')
         .style('width', '100%')
-        .style('height', '800px'); // Erhöhte Höhe
+        .style('height', '400px');
 
-    // Leaflet Map initialisieren
+    // Initialize map
     const map = L.map('map').setView(cityConfig['berlin'].center, 12);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // Farbskala für die Preise
+    // Initialize layers
+    const markersLayer = L.layerGroup().addTo(map);
+    let geojsonLayer;
+
+    // Color scale
     const colorScale = d3.scaleSequential()
         .domain([0, 500])
         .interpolator(d3.interpolateBlues);
 
-    let selectedCity = 'berlin';
-    let selectedPeriod = 'weekday';
-    let markersLayer = L.layerGroup().addTo(map);
-    let geojsonLayer;
-
-    // Legende
+    // Add legend
     const legend = L.control({position: 'bottomright'});
     legend.onAdd = function() {
         const div = L.DomUtil.create('div', 'info legend');
@@ -130,74 +87,87 @@ function createGeoVisualization(data) {
     };
     legend.addTo(map);
 
-    function updateVisualization(selectedCity, selectedPeriod) {
-        const cityData = data.filter(d => 
-            d._filename && 
-            d._filename.includes(`${selectedCity}_${selectedPeriod}`)
-        );
-        const citySettings = cityConfig[selectedCity];
+    // Store context for updates
+    geoVizContext = {
+        map,
+        markersLayer,
+        geojsonLayer,
+        colorScale,
+        cityConfig
+    };
 
-        map.setView(citySettings.center, citySettings.zoom);
-        markersLayer.clearLayers();
+    // Initial visualization
+    updateGeoVisualization(data, 'berlin');
 
-        if (geojsonLayer) {
-            map.removeLayer(geojsonLayer);
-        }
-
-        fetch(citySettings.file)
-            .then(response => response.json())
-            .then(geoData => {
-                geojsonLayer = L.geoJSON(geoData, {
-                    style: {
-                        fillColor: '#e0e0e0',
-                        fillOpacity: 0.3,
-                        color: '#999',
-                        weight: 0.5
-                    }
-                }).addTo(map);
-
-                cityData.forEach(d => {
-                    const circle = L.circleMarker([d.lat, d.lng], {
-                        radius: 4,
-                        fillColor: colorScale(+d.realSum),
-                        color: colorScale(+d.realSum),
-                        weight: 1,
-                        opacity: 1,
-                        fillOpacity: 0.6
-                    });
-
-                    circle.bindPopup(`
-                        <strong>Price:</strong> €${(+d.realSum).toFixed(2)}<br>
-                        <strong>Room Type:</strong> ${d.room_type}<br>
-                        <strong>Capacity:</strong> ${d.person_capacity} persons<br>
-                        <strong>Satisfaction:</strong> ${d.guest_satisfaction_overall}/100<br>
-                        <strong>Cleanliness:</strong> ${d.cleanliness_rating}/10
-                    `);
-
-                    circle.on('mouseover', function() {
-                        this.setStyle({
-                            fillOpacity: 1,
-                            radius: 6
-                        });
-                    });
-
-                    circle.on('mouseout', function() {
-                        this.setStyle({
-                            fillOpacity: 0.6,
-                            radius: 4
-                        });
-                    });
-
-                    markersLayer.addLayer(circle);
-                });
-            });
-    }
-
-    // Erste Visualisierung
-    updateVisualization('berlin', 'weekday');
-
-    // Karte bei Größenänderung aktualisieren
+    // Handle window resize
     window.addEventListener('resize', () => {
         map.invalidateSize();
     });
+}
+
+function updateGeoVisualization(data, selectedCity) {
+    if (!geoVizContext) return;
+    
+    const {map, markersLayer, colorScale, cityConfig} = geoVizContext;
+    const citySettings = cityConfig[selectedCity];
+
+    // Update map view
+    map.setView(citySettings.center, citySettings.zoom);
+    markersLayer.clearLayers();
+
+    if (geoVizContext.geojsonLayer) {
+        map.removeLayer(geoVizContext.geojsonLayer);
+    }
+
+    // Load and add GeoJSON
+    fetch(citySettings.file)
+        .then(response => response.json())
+        .then(geoData => {
+            geoVizContext.geojsonLayer = L.geoJSON(geoData, {
+                style: {
+                    fillColor: '#e0e0e0',
+                    fillOpacity: 0.3,
+                    color: '#999',
+                    weight: 0.5
+                }
+            }).addTo(map);
+
+            // Add markers
+            data.forEach(d => {
+                const circle = L.circleMarker([d.lat, d.lng], {
+                    radius: 4,
+                    fillColor: colorScale(+d.realSum),
+                    color: colorScale(+d.realSum),
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.6
+                });
+
+                circle.bindPopup(`
+                    <strong>Price:</strong> €${(+d.realSum).toFixed(2)}<br>
+                    <strong>Room Type:</strong> ${d.room_type}<br>
+                    <strong>Capacity:</strong> ${d.person_capacity} persons<br>
+                    <strong>Satisfaction:</strong> ${d.guest_satisfaction_overall}/100<br>
+                    <strong>Cleanliness:</strong> ${d.cleanliness_rating}/10
+                `);
+
+                // Add hover effects
+                circle.on('mouseover', function() {
+                    this.setStyle({
+                        fillOpacity: 1,
+                        radius: 6
+                    });
+                });
+
+                circle.on('mouseout', function() {
+                    this.setStyle({
+                        fillOpacity: 0.6,
+                        radius: 4
+                    });
+                });
+
+                markersLayer.addLayer(circle);
+            });
+        })
+        .catch(error => console.error('Error loading GeoJSON:', error));
 }

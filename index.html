@@ -18,6 +18,28 @@
         <div class="header">
             <h1>AirBnB European Cities Analysis</h1>
             <p>Analyse pricing and satisfaction patterns across major European cities</p>
+            <div class="header-controls">
+                <div class="control-group">
+                    <label>City:</label>
+                    <select id="citySelect" onchange="updateAllVisualizations()">
+                        <option value="berlin">Berlin</option>
+                        <option value="amsterdam">Amsterdam</option>
+                        <option value="paris">Paris</option>
+                        <option value="athens">Athens</option>
+                        <option value="budapest">Budapest</option>
+                        <option value="lisbon">Lisbon</option>
+                        <option value="rome">Rome</option>
+                        <option value="vienna">Vienna</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Period:</label>
+                    <select id="periodSelect" onchange="updateAllVisualizations()">
+                        <option value="weekday">Weekday</option>
+                        <option value="weekend">Weekend</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- Visualization Grid -->
