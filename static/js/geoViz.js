@@ -73,18 +73,33 @@ function createGeoVisualization(data) {
 
     // Add legend
     const legend = L.control({position: 'bottomright'});
-    legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'info legend');
-        const grades = [0, 100, 200, 300, 400, 500];
-        
-        div.innerHTML = '<h4>Price (€)</h4>';
-        for (let i = 0; i < grades.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + colorScale(grades[i]) + '"></i> ' +
-                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-        }
-        return div;
-    };
+legend.onAdd = function() {
+    const div = L.DomUtil.create('div', 'info legend');
+    const grades = [0, 100, 200, 300, 400, 500];
+    
+    // Styling für die Legend-Box
+    div.style.backgroundColor = 'white';
+    div.style.padding = '6px 8px';
+    div.style.border = '1px solid #ccc';
+    div.style.borderRadius = '4px';
+    
+    div.innerHTML = '<h4 style="margin:0 0 5px 0">Price (€)</h4>';
+    
+    // Generiere Legend-Einträge mit explizitem Styling für die Farbboxen
+    for (let i = 0; i < grades.length; i++) {
+        div.innerHTML +=
+            '<div style="display:flex; align-items:center; margin:3px 0;">' +
+            '<i style="background:' + colorScale(grades[i]) + '; ' +
+            'width: 18px; ' +
+            'height: 18px; ' +
+            'float: left; ' +
+            'margin-right: 8px; ' +
+            'opacity: 0.7;"></i> ' +
+            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] : '+') +
+            '</div>';
+    }
+    return div;
+};
     legend.addTo(map);
 
     // Store context for updates
@@ -111,10 +126,15 @@ function updateGeoVisualization(data, selectedCity) {
     const {map, markersLayer, colorScale, cityConfig} = geoVizContext;
     const citySettings = cityConfig[selectedCity];
 
+    console.log(`Updating visualization for ${selectedCity} with ${data.length} points`);
+
     // Update map view
     map.setView(citySettings.center, citySettings.zoom);
+    
+    // Clear existing markers
     markersLayer.clearLayers();
 
+    // Remove existing GeoJSON layer
     if (geoVizContext.geojsonLayer) {
         map.removeLayer(geoVizContext.geojsonLayer);
     }
@@ -132,8 +152,14 @@ function updateGeoVisualization(data, selectedCity) {
                 }
             }).addTo(map);
 
-            // Add markers
+            // Add markers for the new data
             data.forEach(d => {
+                // Überprüfe ob lat und lng vorhanden sind
+                if (!d.lat || !d.lng) {
+                    console.warn('Missing coordinates for entry:', d);
+                    return;
+                }
+
                 const circle = L.circleMarker([d.lat, d.lng], {
                     radius: 4,
                     fillColor: colorScale(+d.realSum),
@@ -151,7 +177,6 @@ function updateGeoVisualization(data, selectedCity) {
                     <strong>Cleanliness:</strong> ${d.cleanliness_rating}/10
                 `);
 
-                // Add hover effects
                 circle.on('mouseover', function() {
                     this.setStyle({
                         fillOpacity: 1,

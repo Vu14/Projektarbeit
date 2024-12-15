@@ -28,8 +28,8 @@ async function initializeDashboard() {
         
         // Initialize all visualizations
         createGeoVisualization(filteredData);
-        createPriceVisualization(filteredData);
-        createSatisfactionVisualization(filteredData);
+        //createPriceVisualization(filteredData);
+        //createSatisfactionVisualization(filteredData);
 
         // Hide loading state
         state.isLoading = false;
@@ -42,23 +42,21 @@ async function initializeDashboard() {
 }
 
 // Update all visualizations when selections change
-function updateAllVisualizations() {
+async function updateAllVisualizations() {
     try {
         // Update state with new selections
         state.selectedCity = document.getElementById('citySelect').value;
         state.selectedPeriod = document.getElementById('periodSelect').value;
         
-        // Filter data based on current selections
-        const filteredData = filterData();
+        // Load new data
+        const newData = await loadData();
         
-        // Update each visualization
-        updateGeoVisualization(filteredData, state.selectedCity);
-        updatePriceVisualization(filteredData);
-        updateSatisfactionVisualization(filteredData);
-
+        // Update visualizations with new data
+        updateGeoVisualization(newData, state.selectedCity);
+        updatePriceVisualization(newData);
+        updateSatisfactionVisualization(newData);
     } catch (error) {
         console.error('Error updating visualizations:', error);
-        handleError('Failed to update visualizations');
     }
 }
 
