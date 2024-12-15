@@ -158,3 +158,22 @@ select {
 select:hover {
     border-color: #aaa;
 }
+
+.tooltip {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    pointer-events: none;
+    font-size: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#distanceViz circle {
+    transition: all 0.2s ease;
+}
+
+#distanceViz .legend text {
+    fill: #666;
+}

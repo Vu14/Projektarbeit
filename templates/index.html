@@ -59,11 +59,19 @@
 
             <!-- Satisfaction Analysis -->
             <div class="viz-container">
-                <h2 class="viz-title">Yunus/Valentine</h2>
+                <h2 class="viz-title">Spiderman</h2>
                 <div id="satisfactionViz" class="loading">
                     Visualization loading...
                 </div>
             </div>
+
+            <div class="viz-container">
+                <h2 class="viz-title">Distance vs Price Analysis</h2>
+                <div id="distanceViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+        
         </div>
     </div>
 
@@ -71,7 +79,8 @@
     <script src="{{ url_for('static', filename='js/dataLoader.js') }}"></script>
     <script src="{{ url_for('static', filename='js/geoViz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/priceViz.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/satisfactionViz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/distanceViz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/satisfactionViz.js') }}"></script>
 </body>
 </html>

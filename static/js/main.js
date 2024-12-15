@@ -11,21 +11,25 @@ document.addEventListener('DOMContentLoaded', initializeDashboard);
 
 async function initializeDashboard() {
     try {
-        // Setze Berlin als Standardstadt
-        state.selectedCity = 'berlin';
-        state.selectedPeriod = 'weekday';
-        
-        // Setze die Select-Werte
-        document.getElementById('citySelect').value = state.selectedCity;
-        document.getElementById('periodSelect').value = state.selectedPeriod;
+        console.log("Initializing Dashboard");
+        state.isLoading = true;
 
-        // Lade initiale Daten
         const data = await loadData();
         state.currentData = data;
         
-        // Initialisiere Visualisierungen
+        // Set initial values
+        document.getElementById('citySelect').value = state.selectedCity;
+        document.getElementById('periodSelect').value = state.selectedPeriod;
+
+
+        // Initialize all visualizations
         createGeoVisualization(data);
         createPriceVisualization(data);
+        createDistancePriceVisualization(data); 
+        createSatisfactionVisualization(data);
+
+        state.isLoading = false;
+
 
     } catch (error) {
         console.error('Error initializing dashboard:', error);
@@ -35,17 +39,18 @@ async function initializeDashboard() {
 // Update all visualizations when selections change
 async function updateAllVisualizations() {
     try {
-        // Update state with new selections
+        console.log("Updating visualizations");
         state.selectedCity = document.getElementById('citySelect').value;
         state.selectedPeriod = document.getElementById('periodSelect').value;
         
-        // Load new data
         const newData = await loadData();
         
-        // Update visualizations with new data
+        // Update all visualizations
         updateGeoVisualization(newData, state.selectedCity);
         updatePriceVisualization(newData);
-        //updateSatisfactionVisualization(newData);
+        updateDistancePriceVisualization(newData);  // Add this line if missing
+        updateSatisfactionVisualization(newData);
+        
     } catch (error) {
         console.error('Error updating visualizations:', error);
     }
