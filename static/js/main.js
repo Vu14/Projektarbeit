@@ -11,31 +11,24 @@ document.addEventListener('DOMContentLoaded', initializeDashboard);
 
 async function initializeDashboard() {
     try {
-        // Show loading state
-        state.isLoading = true;
-        updateLoadingState(true);
-
-        // Load initial data
-        const data = await loadData();
-        state.currentData = data;
+        // Setze Berlin als Standardstadt
+        state.selectedCity = 'berlin';
+        state.selectedPeriod = 'weekday';
         
-        // Set initial select values
+        // Setze die Select-Werte
         document.getElementById('citySelect').value = state.selectedCity;
         document.getElementById('periodSelect').value = state.selectedPeriod;
 
-        // Filter initial data
-        const filteredData = filterData();
+        // Lade initiale Daten
+        const data = await loadData();
+        state.currentData = data;
         
-        // Initialize all visualizations
-        createGeoVisualization(filteredData);
-
-        // Hide loading state
-        state.isLoading = false;
-        updateLoadingState(false);
+        // Initialisiere Visualisierungen
+        createGeoVisualization(data);
+        createPriceVisualization(data);
 
     } catch (error) {
         console.error('Error initializing dashboard:', error);
-        handleError('Failed to initialize dashboard');
     }
 }
 
@@ -51,7 +44,7 @@ async function updateAllVisualizations() {
         
         // Update visualizations with new data
         updateGeoVisualization(newData, state.selectedCity);
-        //updatePriceVisualization(newData);
+        updatePriceVisualization(newData);
         //updateSatisfactionVisualization(newData);
     } catch (error) {
         console.error('Error updating visualizations:', error);
