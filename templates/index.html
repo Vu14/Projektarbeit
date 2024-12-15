@@ -4,15 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirBnB Analysis Dashboard</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="js/dataLoader.js"></script>
-    <script src="js/geoViz.js"></script>
-    <script src="js/priceViz.js"></script>
-    <script src="js/main.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
 <body>
-
     <div id="dashboard">
         <!-- Header Section -->
         <div class="header">
@@ -71,13 +68,10 @@
     </div>
 
     <!-- Scripts -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="js/dataLoader.js"></script>
-    <script src="js/priceViz.js"></script>
-    <script src="js/geoViz.js"></script>
-    <script src="js/satisfactionViz.js"></script>
-    <script src="js/distanceViz.js"></script>
-    <script src="js/main.js"></script>
+    <script src="{{ url_for('static', filename='js/dataLoader.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/geoViz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/priceViz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/satisfactionViz.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
