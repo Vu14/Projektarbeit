@@ -1,24 +1,27 @@
+// dataLoader.js
 async function loadData() {
     try {
         const selectedCity = state.selectedCity;
         const selectedPeriod = state.selectedPeriod;
         
-        console.log(`Loading data for ${selectedCity} - ${selectedPeriod}`);
-        
         // Lade Daten vom Flask-Backend
         const response = await fetch(`/api/data/${selectedCity}/${selectedPeriod}`);
         
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
+        console.log('Loaded data:', data.length, 'entries');
+        console.log('Sample entry:', data[0]);  // Debug-Ausgabe
         
         // Add filename property to each data point
         const processedData = data.map(d => ({
             ...d,
-            _filename: `${selectedCity}_${selectedPeriod}`
+            _filename: `${selectedCity}_${selectedPeriod}s`,
+            lat: parseFloat(d.lat), 
+            lng: parseFloat(d.lng),
+            realSum: parseFloat(d.realSum)  
         }));
 
         // Update state

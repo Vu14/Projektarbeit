@@ -119,80 +119,58 @@ legend.onAdd = function() {
         map.invalidateSize();
     });
 }
-
 function updateGeoVisualization(data, selectedCity) {
-    if (!geoVizContext) return;
+    if (!geoVizContext) {
+        console.error('geoVizContext is not initialized');
+        return;
+    }
     
     const {map, markersLayer, colorScale, cityConfig} = geoVizContext;
     const citySettings = cityConfig[selectedCity];
 
-    console.log(`Updating visualization for ${selectedCity} with ${data.length} points`);
-
+    console.log(`Updating visualization for ${selectedCity}`);
+    console.log(`Data points to plot: ${data.length}`);
+    
     // Update map view
     map.setView(citySettings.center, citySettings.zoom);
     
     // Clear existing markers
     markersLayer.clearLayers();
 
-    // Remove existing GeoJSON layer
-    if (geoVizContext.geojsonLayer) {
-        map.removeLayer(geoVizContext.geojsonLayer);
-    }
+    // Debug: Überprüfe die ersten paar Datenpunkte
+    console.log('First few data points:', data.slice(0, 3));
 
-    // Load and add GeoJSON
-    fetch(citySettings.file)
-        .then(response => response.json())
-        .then(geoData => {
-            geoVizContext.geojsonLayer = L.geoJSON(geoData, {
-                style: {
-                    fillColor: '#e0e0e0',
-                    fillOpacity: 0.3,
-                    color: '#999',
-                    weight: 0.5
-                }
-            }).addTo(map);
+    // Add markers
+    data.forEach((d, index) => {
+        if (!d.lat || !d.lng) {
+            console.warn(`Missing coordinates for entry ${index}:`, d);
+            return;
+        }
 
-            // Add markers for the new data
-            data.forEach(d => {
-                // Überprüfe ob lat und lng vorhanden sind
-                if (!d.lat || !d.lng) {
-                    console.warn('Missing coordinates for entry:', d);
-                    return;
-                }
+        // Debug: Log erste paar Marker-Erstellungen
+        if (index < 3) {
+            console.log(`Creating marker at [${d.lat}, ${d.lng}] with price ${d.realSum}`);
+        }
 
-                const circle = L.circleMarker([d.lat, d.lng], {
-                    radius: 4,
-                    fillColor: colorScale(+d.realSum),
-                    color: colorScale(+d.realSum),
-                    weight: 1,
-                    opacity: 1,
-                    fillOpacity: 0.6
-                });
+        const circle = L.circleMarker([d.lat, d.lng], {
+            radius: 4,
+            fillColor: colorScale(+d.realSum),
+            color: colorScale(+d.realSum),
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.6
+        });
 
-                circle.bindPopup(`
-                    <strong>Price:</strong> €${(+d.realSum).toFixed(2)}<br>
-                    <strong>Room Type:</strong> ${d.room_type}<br>
-                    <strong>Capacity:</strong> ${d.person_capacity} persons<br>
-                    <strong>Satisfaction:</strong> ${d.guest_satisfaction_overall}/100<br>
-                    <strong>Cleanliness:</strong> ${d.cleanliness_rating}/10
-                `);
+        circle.bindPopup(`
+            <strong>Price:</strong> €${(+d.realSum).toFixed(2)}<br>
+            <strong>Room Type:</strong> ${d.room_type}<br>
+            <strong>Capacity:</strong> ${d.person_capacity} persons<br>
+            <strong>Satisfaction:</strong> ${d.guest_satisfaction_overall}/100<br>
+            <strong>Cleanliness:</strong> ${d.cleanliness_rating}/10
+        `);
 
-                circle.on('mouseover', function() {
-                    this.setStyle({
-                        fillOpacity: 1,
-                        radius: 6
-                    });
-                });
+        markersLayer.addLayer(circle);
+    });
 
-                circle.on('mouseout', function() {
-                    this.setStyle({
-                        fillOpacity: 0.6,
-                        radius: 4
-                    });
-                });
-
-                markersLayer.addLayer(circle);
-            });
-        })
-        .catch(error => console.error('Error loading GeoJSON:', error));
+    console.log('Finished adding markers');
 }

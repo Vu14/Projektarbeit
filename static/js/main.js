@@ -53,8 +53,8 @@ async function updateAllVisualizations() {
         
         // Update visualizations with new data
         updateGeoVisualization(newData, state.selectedCity);
-        updatePriceVisualization(newData);
-        updateSatisfactionVisualization(newData);
+        //updatePriceVisualization(newData);
+        //updateSatisfactionVisualization(newData);
     } catch (error) {
         console.error('Error updating visualizations:', error);
     }
@@ -71,7 +71,7 @@ function filterData() {
 // Update loading state for visualizations
 function updateLoadingState(isLoading) {
     const loadingClass = 'loading';
-    const vizContainers = ['priceViz', 'geoViz', 'satisfactionViz'];
+    const vizContainers = ['priceViz', 'geoViz'];
     
     vizContainers.forEach(containerId => {
         const container = document.getElementById(containerId);
