@@ -28,8 +28,6 @@ async function initializeDashboard() {
         
         // Initialize all visualizations
         createGeoVisualization(filteredData);
-        //createPriceVisualization(filteredData);
-        //createSatisfactionVisualization(filteredData);
 
         // Hide loading state
         state.isLoading = false;
