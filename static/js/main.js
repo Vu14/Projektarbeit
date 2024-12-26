@@ -48,7 +48,8 @@ async function updateAllVisualizations() {
         // Update all visualizations
         updateGeoVisualization(newData, state.selectedCity);
         updatePriceVisualization(newData);
-        updateDistancePriceVisualization(newData);  // Add this line if missing
+        console.log("Updating Distance Price Visualization");
+        updateDistancePriceVisualization(filterData());  // Use filtered data here
         updateSatisfactionVisualization(newData);
         
     } catch (error) {

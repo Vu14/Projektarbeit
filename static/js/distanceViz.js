@@ -1,85 +1,173 @@
+let distanceVizContext = null;
+
 function createDistancePriceVisualization(data) {
-    // Debug logging
     console.log("Starting Distance Viz with data:", data);
-    console.log("Sample data point:", data[0]);
 
     // Container Setup
     const containerDiv = d3.select('#distanceViz')
         .classed('loading', false)
-        .html('');
+        .html(''); // Clear previous visualizations
 
-    // Check if we have the required data fields
-    if (!data.some(d => d.dist !== undefined && d.realSum !== undefined)) {
-        containerDiv.html('<p style="color: red;">Error: Missing required data fields (dist or realSum)</p>');
-        console.error("Missing required data fields", data[0]);
+    // Handle case with no data
+    if (data.length === 0) {
+        containerDiv.html('<p style="color: gray;">No data available for the selected city and period.</p>');
         return;
     }
 
-    // Fixed dimensions for testing
-    const width = 600;
-    const height = 400;
-    const margin = { top: 40, right: 20, bottom: 60, left: 60 };
+    // Dimensions
+    const margin = { top: 20, right: 30, bottom: 50, left: 70 };
+    const containerWidth = containerDiv.node().getBoundingClientRect().width;
+    const width = containerWidth - margin.left - margin.right;
+    const height = 600 - margin.top - margin.bottom;
 
-    // Create SVG with fixed size first
     const svg = containerDiv.append('svg')
-        .attr('width', width)
-        .attr('height', height)
+        .attr('width', containerWidth)
+        .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Filter data and add debug logging
-    const maxPrice = 1000;
-    const filteredData = data.filter(d => d.realSum <= maxPrice && d.dist);
-    console.log("Filtered data points:", filteredData.length);
+    // Scales
+    const xScale = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.dist))
+        .range([0, width]);
 
-    // Adjust dimensions
-    const plotWidth = width - margin.left - margin.right;
-    const plotHeight = height - margin.top - margin.bottom;
+    const yScale = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.realSum))
+        .range([height, 0]);
 
-    // Create scales
-    const x = d3.scaleLinear()
-        .domain([0, d3.max(filteredData, d => d.dist)])
-        .range([0, plotWidth]);
+    // Axes
+    const xAxis = svg.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(xScale));
 
-    const y = d3.scaleLinear()
-        .domain([0, maxPrice])
-        .range([plotHeight, 0]);
+    xAxis.append("text")
+        .attr("x", width / 2)
+        .attr("y", 40)
+        .attr("fill", "black")
+        .style("font-size", "12px")
+        .style("text-anchor", "middle")
+        .text("Distance to City Center");
 
-    // Add axes first to be behind points
-    svg.append('g')
-        .attr('transform', `translate(0,${plotHeight})`)
-        .call(d3.axisBottom(x));
+    const yAxis = svg.append('g')
+        .attr('class', 'y-axis')
+        .call(d3.axisLeft(yScale));
 
-    svg.append('g')
-        .call(d3.axisLeft(y));
+    yAxis.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -50)
+        .attr("fill", "black")
+        .style("font-size", "12px")
+        .style("text-anchor", "middle")
+        .text("Rental Price (RealSum)");
 
-    // Add dots
-    svg.selectAll('circle')
-        .data(filteredData)
+    // Tooltip setup
+    const tooltip = d3.select('#distanceViz')
+        .append('div')
+        .attr('class', 'tooltip')
+        .style('opacity', 0);
+
+    // Scatterplot points
+    const pointsGroup = svg.append('g');
+
+    pointsGroup.selectAll('.point')
+        .data(data)
         .enter()
         .append('circle')
-        .attr('cx', d => x(d.dist))
-        .attr('cy', d => y(d.realSum))
-        .attr('r', 4)
+        .attr('class', 'point')
+        .attr('cx', d => xScale(d.dist))
+        .attr('cy', d => yScale(d.realSum))
+        .attr('r', 5)
         .style('fill', 'steelblue')
-        .style('opacity', 0.5);
+        .on('mouseover', function (event, d) {
+            tooltip.transition().duration(200).style('opacity', 0.9);
+            tooltip.html(`Distance: ${d.dist}<br>Price: ${d.realSum}`)
+                .style('left', (event.pageX + 5) + 'px')
+                .style('top', (event.pageY - 28) + 'px');
+        })
+        .on('mouseout', function () {
+            tooltip.transition().duration(500).style('opacity', 0);
+        })
+        .on('click', function (event, d) {
+            tooltip.html(`Distance: ${d.dist}<br>Price: ${d.realSum}`)
+                .style('left', (event.pageX + 5) + 'px')
+                .style('top', (event.pageY - 28) + 'px')
+                .style('opacity', 1);
+        });
 
-    // Add labels
-    svg.append('text')
-        .attr('x', plotWidth / 2)
-        .attr('y', plotHeight + 40)
-        .style('text-anchor', 'middle')
-        .text('Distance to Center (km)');
+    // Slider for Y-axis scaling
+    const slider = containerDiv.append('input')
+        .attr('type', 'range')
+        .attr('min', 10)
+        .attr('max', 100)
+        .attr('value', 100)
+        .attr('step', 1)
+        .style('width', '200px')
+        .on('input', function () {
+            const scaleFactor = +this.value / 100;
+            const newYExtent = [
+                d3.extent(data, d => d.realSum)[0],
+                d3.extent(data, d => d.realSum)[0] + (d3.extent(data, d => d.realSum)[1] - d3.extent(data, d => d.realSum)[0]) * scaleFactor
+            ];
+            yScale.domain(newYExtent);
 
-    svg.append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('y', -40)
-        .attr('x', -plotHeight / 2)
-        .style('text-anchor', 'middle')
-        .text('Price (€)');
+            pointsGroup.selectAll('.point')
+                .attr('cy', d => yScale(d.realSum));
+
+            yAxis.call(d3.axisLeft(yScale));
+        });
+
+    containerDiv.append('label')
+        .text('Y-Axis Scale:')
+        .style('margin-right', '10px')
+        .style('display', 'block')
+        .node().appendChild(slider.node());
+
+    // Save context
+    distanceVizContext = { svg, xScale, yScale, pointsGroup };
+
+    console.log("Distance Viz rendered successfully.");
 }
 
 function updateDistancePriceVisualization(data) {
     console.log("Updating Distance Viz");
-    createDistancePriceVisualization(data);
+
+    if (!distanceVizContext) {
+        console.warn('distanceVizContext not initialized. Recreating visualization.');
+        createDistancePriceVisualization(data);
+        return;
+    }
+
+    const { svg, xScale, yScale, pointsGroup } = distanceVizContext;
+
+    // Update scales
+    xScale.domain(d3.extent(data, d => d.dist));
+    yScale.domain(d3.extent(data, d => d.realSum));
+
+    // Update axes
+    svg.select('.x-axis')
+        .transition().duration(500)
+        .call(d3.axisBottom(xScale));
+
+    svg.select('.y-axis')
+        .transition().duration(500)
+        .call(d3.axisLeft(yScale));
+
+    // Update points
+    const points = pointsGroup.selectAll('.point').data(data);
+
+    points.enter()
+        .append('circle')
+        .attr('class', 'point')
+        .attr('r', 5)
+        .style('fill', 'steelblue')
+        .merge(points)
+        .transition().duration(500)
+        .attr('cx', d => xScale(d.dist))
+        .attr('cy', d => yScale(d.realSum));
+
+    points.exit().remove();
+
+    console.log("Distance Viz updated successfully.");
 }
