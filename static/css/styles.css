@@ -23,7 +23,11 @@ body {
     border-radius: 8px;
     margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: sticky; 
+    top: 0; 
+    z-index: 1000; 
 }
+
 
 .header h1 {
     color: #333;
