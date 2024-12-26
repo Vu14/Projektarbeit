@@ -1,8 +1,6 @@
 let distanceVizContext = null;
 
 function createDistancePriceVisualization(data) {
-    console.log("Starting Distance Viz with data:", data);
-
     // Container Setup
     const containerDiv = d3.select('#distanceViz')
         .classed('loading', false)
@@ -126,13 +124,9 @@ function createDistancePriceVisualization(data) {
 
     // Save context
     distanceVizContext = { svg, xScale, yScale, pointsGroup };
-
-    console.log("Distance Viz rendered successfully.");
 }
 
 function updateDistancePriceVisualization(data) {
-    console.log("Updating Distance Viz");
-
     if (!distanceVizContext) {
         console.warn('distanceVizContext not initialized. Recreating visualization.');
         createDistancePriceVisualization(data);
@@ -168,6 +162,4 @@ function updateDistancePriceVisualization(data) {
         .attr('cy', d => yScale(d.realSum));
 
     points.exit().remove();
-
-    console.log("Distance Viz updated successfully.");
 }

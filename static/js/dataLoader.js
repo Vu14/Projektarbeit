@@ -1,30 +1,31 @@
-// dataLoader.js
+/**
+ * Function to load data based on the selected city and period.
+ */
 async function loadData() {
     try {
         const selectedCity = state.selectedCity;
         const selectedPeriod = state.selectedPeriod;
-        
-        // Lade Daten vom Flask-Backend
+
+        // Fetch data from the Flask backend
         const response = await fetch(`/api/data/${selectedCity}/${selectedPeriod}`);
         
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
+        // Parse the JSON response
         const data = await response.json();
-        console.log('Loaded data:', data.length, 'entries');
-        console.log('Sample entry:', data[0]);  // Debug-Ausgabe
         
-        // Add filename property to each data point
+        // Process the data: Add a filename property and convert numeric fields
         const processedData = data.map(d => ({
             ...d,
-            _filename: `${selectedCity}_${selectedPeriod}s`,
-            lat: parseFloat(d.lat), 
-            lng: parseFloat(d.lng),
-            realSum: parseFloat(d.realSum)  
+            _filename: `${selectedCity}_${selectedPeriod}s`, // Filename identifier for debugging
+            lat: parseFloat(d.lat), // Ensure latitude is a float
+            lng: parseFloat(d.lng), // Ensure longitude is a float
+            realSum: parseFloat(d.realSum) // Ensure price is a float
         }));
 
-        // Update state
+        // Update application state with the loaded data
         state.currentData = processedData;
         
         return processedData;
@@ -34,26 +35,3 @@ async function loadData() {
         throw error;
     }
 }
-
-async function updateDataForTimePeriod(period) {
-    state.timePeriod = period;
-    return await loadData();
-}
-
-function filterDataByCities(cities) {
-    state.selectedCities = cities;
-    const filteredData = state.currentData.filter(d => 
-        cities.includes(d.city.toLowerCase())
-    );
-    updateAllVisualizations(filteredData);
-}
-
-function filterDataByPrice(maxPrice) {
-    state.priceRange = maxPrice;
-    const filteredData = state.currentData.filter(d => 
-        d.realSum <= maxPrice
-    );
-    updateAllVisualizations(filteredData);
-}
-
-

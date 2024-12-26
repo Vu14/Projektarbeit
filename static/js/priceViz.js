@@ -1,11 +1,15 @@
 let resizeTimeout;
 
+/**
+ * Function to create a price visualization using D3.js.
+ * @param {Array} data - Array of data points to visualize.
+ */
 function createPriceVisualization(data) {
-    // Filter extreme Ausreißer
+    // Filter extreme outliers
     const maxPrice = 1000;
     data = data.filter(d => d.realSum <= maxPrice);
 
-    // Container Setup
+    // Container setup
     const containerDiv = d3.select('#priceViz')
         .classed('loading', false)
         .html('')
@@ -14,13 +18,13 @@ function createPriceVisualization(data) {
         .style('gap', '20px')
         .style('height', '100%');
 
-    // Plot Container
+    // Plot container
     const plotDiv = containerDiv.append('div')
         .style('flex', '1')
         .style('min-width', '0')
         .style('height', '100%');
 
-    // Stats Container
+    // Stats container
     const statsDiv = containerDiv.append('div')
         .style('width', '200px')
         .style('padding', '10px')
@@ -45,7 +49,7 @@ function createPriceVisualization(data) {
     const width = containerWidth - margin.left - margin.right;
     const height = containerHeight - margin.top - margin.bottom;
 
-    // Create SVG
+    // Create SVG element
     const svg = plotDiv.append('svg')
         .attr('width', '100%')
         .attr('height', '100%')
@@ -53,7 +57,7 @@ function createPriceVisualization(data) {
         .append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-    // Prepare data
+    // Prepare data: Calculate statistics for each city
     const pricesByCity = d3.rollup(data,
         v => ({
             q1: d3.quantile(v.map(d => d.realSum), 0.25),
@@ -67,7 +71,7 @@ function createPriceVisualization(data) {
         d => d.city
     );
 
-    // Scales
+    // Set up scales
     const x = d3.scaleBand()
         .range([0, width])
         .domain([...pricesByCity.keys()])
@@ -81,16 +85,9 @@ function createPriceVisualization(data) {
     // Draw box plots
     pricesByCity.forEach((stats, city) => {
         const group = svg.append('g')
-            .attr('class', 'box-group')
-            .on('mouseover', function() {
-                updateStatsDisplay(city, stats);
-                d3.select(this).selectAll('rect').attr('opacity', 1);
-            })
-            .on('mouseout', function() {
-                d3.select(this).selectAll('rect').attr('opacity', 0.8);
-            });
+            .attr('class', 'box-group');
 
-        // Box
+        // Box for interquartile range
         group.append('rect')
             .attr('x', x(city))
             .attr('y', y(stats.q3))
@@ -110,30 +107,30 @@ function createPriceVisualization(data) {
 
         // Whiskers
         group.append('line')
-            .attr('x1', x(city) + x.bandwidth()/2)
-            .attr('x2', x(city) + x.bandwidth()/2)
+            .attr('x1', x(city) + x.bandwidth() / 2)
+            .attr('x2', x(city) + x.bandwidth() / 2)
             .attr('y1', y(stats.min))
             .attr('y2', y(stats.q1))
             .attr('stroke', 'black');
 
         group.append('line')
-            .attr('x1', x(city) + x.bandwidth()/2)
-            .attr('x2', x(city) + x.bandwidth()/2)
+            .attr('x1', x(city) + x.bandwidth() / 2)
+            .attr('x2', x(city) + x.bandwidth() / 2)
             .attr('y1', y(stats.q3))
             .attr('y2', y(stats.max))
             .attr('stroke', 'black');
 
         // Whisker ends
         group.append('line')
-            .attr('x1', x(city) - x.bandwidth()/4)
-            .attr('x2', x(city) + x.bandwidth()/4 + x.bandwidth())
+            .attr('x1', x(city) - x.bandwidth() / 4)
+            .attr('x2', x(city) + x.bandwidth() / 4 + x.bandwidth())
             .attr('y1', y(stats.min))
             .attr('y2', y(stats.min))
             .attr('stroke', 'black');
 
         group.append('line')
-            .attr('x1', x(city) - x.bandwidth()/4)
-            .attr('x2', x(city) + x.bandwidth()/4 + x.bandwidth())
+            .attr('x1', x(city) - x.bandwidth() / 4)
+            .attr('x2', x(city) + x.bandwidth() / 4 + x.bandwidth())
             .attr('y1', y(stats.max))
             .attr('y2', y(stats.max))
             .attr('stroke', 'black');
@@ -154,24 +151,27 @@ function createPriceVisualization(data) {
             .ticks(5))
         .style('font-size', '12px');
 
-    // Stats box title
+    // Create and display statistics in stats container
     statsDiv.append('h3')
         .style('margin', '0 0 10px 0')
         .style('font-size', '14px')
         .style('color', '#333')
         .text('Price Statistics');
 
-    // Stats content container
     const statsContent = statsDiv.append('div')
         .attr('class', 'stats-content')
         .style('font-size', '13px')
         .style('line-height', '1.4');
 
-    // Show initial stats
     const initialCity = state.selectedCity || 'berlin';
     const initialStats = pricesByCity.get(initialCity);
     updateStatsDisplay(initialCity, initialStats);
 
+    /**
+     * Function to update stats display for a selected city.
+     * @param {string} city - City name.
+     * @param {Object} stats - Statistics for the city.
+     */
     function updateStatsDisplay(city, stats) {
         statsContent.html(`
             <div style="margin-bottom: 15px">
@@ -219,6 +219,10 @@ function createPriceVisualization(data) {
     });
 }
 
+/**
+ * Function to update the price visualization with new data.
+ * @param {Array} data - Array of data points to visualize.
+ */
 function updatePriceVisualization(data) {
     createPriceVisualization(data);
 }

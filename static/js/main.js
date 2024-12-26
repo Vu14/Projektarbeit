@@ -1,26 +1,28 @@
 // Global state to manage dashboard data and selections
 let state = {
-    currentData: null,
-    selectedCity: 'berlin',
-    selectedPeriod: 'weekday',
-    isLoading: true
+    currentData: null, // Holds the current dataset
+    selectedCity: 'berlin', // Default city
+    selectedPeriod: 'weekday', // Default time period
+    isLoading: true // Tracks the loading state
 };
 
-// Initialize the dashboard when page loads
+// Initialize the dashboard when the page loads
 document.addEventListener('DOMContentLoaded', initializeDashboard);
 
+/**
+ * Function to initialize the dashboard.
+ * Loads data, sets default selections, and initializes visualizations.
+ */
 async function initializeDashboard() {
     try {
-        console.log("Initializing Dashboard");
-        state.isLoading = true;
+        state.isLoading = true; // Set loading state
 
-        const data = await loadData();
-        state.currentData = data;
+        const data = await loadData(); // Fetch data
+        state.currentData = data; // Store data in state
         
-        // Set initial values
+        // Set initial values for dropdowns
         document.getElementById('citySelect').value = state.selectedCity;
         document.getElementById('periodSelect').value = state.selectedPeriod;
-
 
         // Initialize all visualizations
         createGeoVisualization(data);
@@ -28,36 +30,38 @@ async function initializeDashboard() {
         createDistancePriceVisualization(data); 
         createSatisfactionVisualization(data);
 
-        state.isLoading = false;
-
+        state.isLoading = false; // Update loading state
 
     } catch (error) {
-        console.error('Error initializing dashboard:', error);
+        handleError('Error initializing dashboard: ' + error.message);
     }
 }
 
-// Update all visualizations when selections change
+/**
+ * Function to update all visualizations when selections change.
+ */
 async function updateAllVisualizations() {
     try {
-        console.log("Updating visualizations");
         state.selectedCity = document.getElementById('citySelect').value;
         state.selectedPeriod = document.getElementById('periodSelect').value;
         
-        const newData = await loadData();
+        const newData = await loadData(); // Fetch updated data
         
-        // Update all visualizations
+        // Update all visualizations with new data
         updateGeoVisualization(newData, state.selectedCity);
         updatePriceVisualization(newData);
-        console.log("Updating Distance Price Visualization");
-        updateDistancePriceVisualization(filterData());  // Use filtered data here
+        updateDistancePriceVisualization(filterData()); // Filtered data for distance visualization
         updateSatisfactionVisualization(newData);
-        
+
     } catch (error) {
-        console.error('Error updating visualizations:', error);
+        handleError('Error updating visualizations: ' + error.message);
     }
 }
 
-// Filter data based on current state
+/**
+ * Function to filter the current data based on the selected city and period.
+ * @returns {Array} Filtered dataset
+ */
 function filterData() {
     return state.currentData.filter(d => 
         d._filename && 
@@ -65,38 +69,32 @@ function filterData() {
     );
 }
 
-// Update loading state for visualizations
-function updateLoadingState(isLoading) {
-    const loadingClass = 'loading';
-    const vizContainers = ['priceViz', 'geoViz'];
-    
-    vizContainers.forEach(containerId => {
-        const container = document.getElementById(containerId);
-        if (container) {
-            if (isLoading) {
-                container.classList.add(loadingClass);
-            } else {
-                container.classList.remove(loadingClass);
-            }
-        }
-    });
-}
-
-// Handle errors
+/**
+ * Function to handle errors.
+ * Logs the error and can be extended to display UI feedback.
+ * @param {string} message - The error message to handle.
+ */
 function handleError(message) {
-    // You can customize this based on how you want to show errors
     console.error(message);
-    // Could add UI error handling here
+    // Add UI error handling logic here if needed
 }
 
-// Add window resize handler
+/**
+ * Adds a resize event handler to update visualizations on window resize.
+ * Uses debounce to optimize performance.
+ */
 window.addEventListener('resize', debounce(() => {
     if (!state.isLoading) {
         updateAllVisualizations();
     }
 }, 250));
 
-// Utility function for debouncing
+/**
+ * Utility function to debounce function execution.
+ * @param {Function} func - The function to debounce.
+ * @param {number} wait - The debounce delay in milliseconds.
+ * @returns {Function} Debounced function.
+ */
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -109,5 +107,5 @@ function debounce(func, wait) {
     };
 }
 
-// Export state for other modules if needed
+// Export state globally if needed for debugging or external modules
 window.dashboardState = state;

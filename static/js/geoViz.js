@@ -1,5 +1,9 @@
 let geoVizContext = null;
 
+/**
+ * Function to create the Geo Visualization with initial setup.
+ * @param {Array} data - Data points to visualize.
+ */
 function createGeoVisualization(data) {
     const cityConfig = {
         'berlin': {
@@ -44,18 +48,17 @@ function createGeoVisualization(data) {
         }
     };
 
-    // Container setup
+    // Create and configure the map container
     const container = d3.select('#geoViz')
         .classed('loading', false)
         .html('');
 
-    // Map Container
     const mapContainer = container.append('div')
         .attr('id', 'map')
         .style('width', '100%')
         .style('height', '400px');
 
-    // Initialize map
+    // Initialize the map with default city (Berlin)
     const map = L.map('map').setView(cityConfig['berlin'].center, 12);
     
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -66,43 +69,41 @@ function createGeoVisualization(data) {
     const markersLayer = L.layerGroup().addTo(map);
     let geojsonLayer;
 
-    // Color scale
+    // Create color scale for visualization
     const colorScale = d3.scaleSequential()
         .domain([0, 500])
         .interpolator(d3.interpolateBlues);
 
-    // Add legend
-    const legend = L.control({position: 'bottomright'});
-legend.onAdd = function() {
-    const div = L.DomUtil.create('div', 'info legend');
-    const grades = [0, 100, 200, 300, 400, 500];
-    
-    // Styling für die Legend-Box
-    div.style.backgroundColor = 'white';
-    div.style.padding = '6px 8px';
-    div.style.border = '1px solid #ccc';
-    div.style.borderRadius = '4px';
-    
-    div.innerHTML = '<h4 style="margin:0 0 5px 0">Price (€)</h4>';
-    
-    // Generiere Legend-Einträge mit explizitem Styling für die Farbboxen
-    for (let i = 0; i < grades.length; i++) {
-        div.innerHTML +=
-            '<div style="display:flex; align-items:center; margin:3px 0;">' +
-            '<i style="background:' + colorScale(grades[i]) + '; ' +
-            'width: 18px; ' +
-            'height: 18px; ' +
-            'float: left; ' +
-            'margin-right: 8px; ' +
-            'opacity: 0.7;"></i> ' +
-            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] : '+') +
-            '</div>';
-    }
-    return div;
-};
+    // Add a legend to the map
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function() {
+        const div = L.DomUtil.create('div', 'info legend');
+        const grades = [0, 100, 200, 300, 400, 500];
+        
+        div.style.backgroundColor = 'white';
+        div.style.padding = '6px 8px';
+        div.style.border = '1px solid #ccc';
+        div.style.borderRadius = '4px';
+        
+        div.innerHTML = '<h4 style="margin:0 0 5px 0">Price (€)</h4>';
+        
+        for (let i = 0; i < grades.length; i++) {
+            div.innerHTML +=
+                '<div style="display:flex; align-items:center; margin:3px 0;">' +
+                '<i style="background:' + colorScale(grades[i]) + '; ' +
+                'width: 18px; ' +
+                'height: 18px; ' +
+                'float: left; ' +
+                'margin-right: 8px; ' +
+                'opacity: 0.7;"></i> ' +
+                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] : '+') +
+                '</div>';
+        }
+        return div;
+    };
     legend.addTo(map);
 
-    // Store context for updates
+    // Store the visualization context for updates
     geoVizContext = {
         map,
         markersLayer,
@@ -111,46 +112,38 @@ legend.onAdd = function() {
         cityConfig
     };
 
-    // Initial visualization
+    // Initialize visualization with default city
     updateGeoVisualization(data, 'berlin');
 
-    // Handle window resize
+    // Handle window resizing
     window.addEventListener('resize', () => {
         map.invalidateSize();
     });
 }
+
+/**
+ * Function to update the Geo Visualization with new data and city settings.
+ * @param {Array} data - Data points to visualize.
+ * @param {string} selectedCity - The selected city for the visualization.
+ */
 function updateGeoVisualization(data, selectedCity) {
     if (!geoVizContext) {
         console.error('geoVizContext is not initialized');
         return;
     }
     
-    const {map, markersLayer, colorScale, cityConfig} = geoVizContext;
+    const { map, markersLayer, colorScale, cityConfig } = geoVizContext;
     const citySettings = cityConfig[selectedCity];
 
-    console.log(`Updating visualization for ${selectedCity}`);
-    console.log(`Data points to plot: ${data.length}`);
-    
-    // Update map view
+    // Update the map view to the selected city's settings
     map.setView(citySettings.center, citySettings.zoom);
     
-    // Clear existing markers
+    // Clear existing markers from the map
     markersLayer.clearLayers();
 
-    // Debug: Überprüfe die ersten paar Datenpunkte
-    console.log('First few data points:', data.slice(0, 3));
-
-    // Add markers
-    data.forEach((d, index) => {
-        if (!d.lat || !d.lng) {
-            console.warn(`Missing coordinates for entry ${index}:`, d);
-            return;
-        }
-
-        // Debug: Log erste paar Marker-Erstellungen
-        if (index < 3) {
-            console.log(`Creating marker at [${d.lat}, ${d.lng}] with price ${d.realSum}`);
-        }
+    // Add markers for each data point
+    data.forEach(d => {
+        if (!d.lat || !d.lng) return; // Skip entries with missing coordinates
 
         const circle = L.circleMarker([d.lat, d.lng], {
             radius: 4,
@@ -171,6 +164,4 @@ function updateGeoVisualization(data, selectedCity) {
 
         markersLayer.addLayer(circle);
     });
-
-    console.log('Finished adding markers');
 }
