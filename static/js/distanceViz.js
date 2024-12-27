@@ -80,7 +80,7 @@ function createDistancePriceVisualization(data) {
         .style('fill', 'steelblue')
         .on('mouseover', function (event, d) {
             tooltip.transition().duration(200).style('opacity', 0.9);
-            tooltip.html(`Distance: ${d.dist}<br>Price: ${d.realSum}`)
+            tooltip.html(`Distance: ${d.dist.toFixed(2)}<br>Price: ${d.realSum.toFixed(2)}`)
                 .style('left', (event.pageX + 5) + 'px')
                 .style('top', (event.pageY - 28) + 'px');
         })
@@ -88,7 +88,7 @@ function createDistancePriceVisualization(data) {
             tooltip.transition().duration(500).style('opacity', 0);
         })
         .on('click', function (event, d) {
-            tooltip.html(`Distance: ${d.dist}<br>Price: ${d.realSum}`)
+            tooltip.html(`Distance: ${d.dist.toFixed(2)}<br>Price: ${d.realSum.toFixed(2)}`)
                 .style('left', (event.pageX + 5) + 'px')
                 .style('top', (event.pageY - 28) + 'px')
                 .style('opacity', 1);
