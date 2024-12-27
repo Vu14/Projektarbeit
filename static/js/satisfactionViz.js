@@ -1,3 +1,14 @@
+const toggleButton = document.getElementById('darkModeToggle');
+toggleButton.addEventListener('click', () => {
+    document.documentElement.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.documentElement.classList.contains('dark-mode'));
+});
+
+// Load user preference on page load
+if (localStorage.getItem('darkMode') === 'true') {
+    document.documentElement.classList.add('dark-mode');
+}
+
 /**
  * Function to create a satisfaction visualization using a radar chart.
  * @param {Array} data - Array of data points to visualize.
@@ -87,51 +98,57 @@ function createSatisfactionVisualization(data) {
         .attr('stroke', '#999')
         .attr('stroke-dasharray', '2,2');
 
-    // Add axis labels with values
-    axes.append('g')
-        .attr('transform', (d, i) => {
-            const angle = angleScale(i) - Math.PI / 2;
-            const x = (radius + 20) * Math.cos(angle);
-            const y = (radius + 20) * Math.sin(angle);
-            return `translate(${x},${y})`;
-        })
-        .each(function (feature) {
-            const value = meanValues[feature.name];
-            let displayValue;
+        // Add axis labels with values
+        // Add axis labels with values
+        axes.append('g')
+            .attr('transform', (d, i) => {
+                const angle = angleScale(i) - Math.PI / 2;
+                const x = (radius + 20) * Math.cos(angle);
+                const y = (radius + 20) * Math.sin(angle);
+                return `translate(${x},${y})`;
+            })
+            .each(function (feature) {
+                const value = meanValues[feature.name];
+                let displayValue;
 
-            switch (feature.name) {
-                case 'cleanliness_rating':
-                    displayValue = (value / 10).toFixed(1) + '/10';
-                    break;
-                case 'dist':
-                    displayValue = ((100 - value) / 5).toFixed(1) + 'km';
-                    break;
-                case 'attr_index':
-                case 'rest_index':
-                    displayValue = value.toFixed(0) + '%';
-                    break;
-                default:
-                    displayValue = value.toFixed(0) + '%';
-            }
+                switch (feature.name) {
+                    case 'cleanliness_rating':
+                        displayValue = (value / 10).toFixed(1) + '/10';
+                        break;
+                    case 'dist':
+                        displayValue = ((100 - value) / 5).toFixed(1) + ' km';
+                        break;
+                    case 'attr_index':
+                    case 'rest_index':
+                        displayValue = value.toFixed(0) + '%';
+                        break;
+                    default:
+                        displayValue = value.toFixed(0) + '%';
+                }
 
-            // Add label
-            d3.select(this)
-                .append('text')
-                .attr('text-anchor', 'middle')
-                .attr('dy', '-0.5em')
-                .style('font-weight', 'bold')
-                .style('font-size', '12px')
-                .text(feature.label);
+                // Add label
+                d3.select(this)
+                    .append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '-0.5em')
+                    .style('font-weight', 'bold')
+                    .style('font-size', '12px')
+                    .style('fill', 'var(--text-color)') // Dynamische Textfarbe
+                    .text(feature.label);
 
-            // Add value
-            d3.select(this)
-                .append('text')
-                .attr('text-anchor', 'middle')
-                .attr('dy', '1em')
-                .style('font-size', '12px')
-                .style('fill', '#2c7fb8')
-                .text(displayValue);
-        });
+                // Add value
+                d3.select(this)
+                    .append('text')
+                    .attr('text-anchor', 'middle')
+                    .attr('dy', '1em')
+                    .style('font-size', '12px')
+                    .style('fill', 'var(--text-color)') // Dynamische Textfarbe auch für Werte
+                    .text(displayValue);
+            });
+
+
+
+
 
     // Add radial labels
     svg.selectAll('.circle-label')

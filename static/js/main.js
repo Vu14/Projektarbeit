@@ -106,6 +106,48 @@ function debounce(func, wait) {
         timeout = setTimeout(later, wait);
     };
 }
+async function exportToPDF() {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('p', 'mm', 'a4'); // DIN A4 in Portrait-Modus
+
+    const pageWidth = 210; // A4 Breite in mm
+    const pageHeight = 297; // A4 Höhe in mm
+    const margin = 10; // Ränder in mm
+    let yPosition = margin; // Startposition auf der Seite
+
+    // Titel hinzufügen
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.text('Dashboard Export', pageWidth / 2, yPosition, { align: 'center' });
+    yPosition += 10; // Abstand nach Titel
+
+    // HTML-Elemente auswählen und in Bilder umwandeln
+    const charts = document.querySelectorAll('.chart-container'); // Passe den Selektor an deine Diagramme an
+
+    for (let i = 0; i < charts.length; i++) {
+        const chart = charts[i];
+
+        // Diagramm als Bild umwandeln
+        const canvas = await html2canvas(chart); // Verwende html2canvas für Screenshot
+        const imgData = canvas.toDataURL('image/png');
+
+        // Verhältnis berechnen
+        const imgWidth = pageWidth - 2 * margin;
+        const imgHeight = (canvas.height / canvas.width) * imgWidth;
+
+        // Bild hinzufügen
+        if (yPosition + imgHeight > pageHeight - margin) {
+            pdf.addPage(); // Neue Seite hinzufügen, wenn Platz nicht reicht
+            yPosition = margin;
+        }
+
+        pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
+        yPosition += imgHeight + 10; // Abstand nach dem Bild
+    }
+
+    // PDF herunterladen
+    pdf.save('dashboard-export.pdf');
+}
 
 // Export state globally if needed for debugging or external modules
 window.dashboardState = state;

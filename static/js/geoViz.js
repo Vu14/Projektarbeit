@@ -80,16 +80,16 @@ function createGeoVisualization(data) {
         const div = L.DomUtil.create('div', 'info legend');
         const grades = [0, 100, 200, 300, 400, 500];
         
-        div.style.backgroundColor = 'white';
+        div.style.backgroundColor = 'var(--header-background)';
         div.style.padding = '6px 8px';
-        div.style.border = '1px solid #ccc';
+        div.style.border = '1px solid var(--box-shadow)';
         div.style.borderRadius = '4px';
         
-        div.innerHTML = '<h4 style="margin:0 0 5px 0">Price (€)</h4>';
+        div.innerHTML = '<h4 style="margin:0 0 5px 0; color: var(--text-color)">Price (€)</h4>';
         
         for (let i = 0; i < grades.length; i++) {
             div.innerHTML +=
-                '<div style="display:flex; align-items:center; margin:3px 0;">' +
+                '<div style="display:flex; align-items:center; margin:3px 0; color: var(--text-color)">' +
                 '<i style="background:' + colorScale(grades[i]) + '; ' +
                 'width: 18px; ' +
                 'height: 18px; ' +

@@ -1,16 +1,25 @@
 /* ======================== */
 /* Base Styles */
 /* ======================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:root {
+    --background-color: #f5f5f5;
+    --text-color: #000000;
+    --header-background: white;
+    --box-shadow: rgba(0, 0, 0, 0.1);
+}
+
+:root.dark-mode {
+    --background-color: #121212;
+    --text-color: #ffffff;
+    --header-background: #1e1e1e;
+    --box-shadow: rgba(255, 255, 255, 0.1);
 }
 
 body {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background-color: #f5f5f5;
+    background-color: var(--background-color);
+    color: var(--text-color);
 }
 
 #dashboard {
@@ -22,23 +31,23 @@ body {
 /* Header Styles */
 /* ======================== */
 .header {
-    background: white;
+    background: var(--header-background);
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--box-shadow);
     position: sticky;
     top: 0;
     z-index: 10000;
 }
 
 .header h1 {
-    color: #333;
+    color: var(--text-color);
     margin-bottom: 10px;
 }
 
 .header p {
-    color: #666;
+    color: var(--text-color);
 }
 
 .header-controls {
@@ -58,9 +67,9 @@ body {
     flex-wrap: wrap;
     margin-bottom: 20px;
     padding: 15px;
-    background: white;
+    background: var(--header-background);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--box-shadow);
 }
 
 .control-group {
@@ -70,7 +79,7 @@ body {
 }
 
 .control-group label {
-    color: #555;
+    color: var(--text-color);
     font-weight: 500;
     min-width: 60px;
 }
@@ -79,7 +88,8 @@ select, button {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    background: white;
+    background: var(--header-background);
+    color: var(--text-color);
 }
 
 select:hover, button:hover {
@@ -101,11 +111,11 @@ select {
 }
 
 .viz-container {
-    background: white;
+    background: var(--header-background);
     padding: 20px;
     border-radius: 8px;
     min-height: 400px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--box-shadow);
 }
 
 .viz-title {
@@ -113,7 +123,7 @@ select {
     margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
-    color: #444;
+    color: var(--text-color);
 }
 
 /* ======================== */
@@ -125,7 +135,7 @@ select {
     align-items: center;
     height: 300px;
     font-style: italic;
-    color: #666;
+    color: var(--text-color);
 }
 
 /* ======================== */
@@ -156,13 +166,13 @@ select {
 /* ======================== */
 .tooltip {
     position: absolute;
-    background: white;
+    background: var(--header-background);
     border: 1px solid #ddd;
     border-radius: 4px;
     padding: 8px;
     pointer-events: none;
     font-size: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--box-shadow);
 }
 
 /* ======================== */
@@ -178,18 +188,18 @@ select {
 }
 
 #distanceViz .legend text {
-    fill: #666;
+    fill: var(--text-color);
 }
 
 #distanceVizPopup {
     position: absolute;
-    background: white;
+    background: var(--header-background);
     border: 1px solid #ddd;
     border-radius: 8px;
     padding: 10px;
     pointer-events: none;
     font-size: 12px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px var(--box-shadow);
     opacity: 0;
     transition: opacity 0.2s ease-in-out;
     z-index: 1000;

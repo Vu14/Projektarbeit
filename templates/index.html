@@ -47,6 +47,9 @@
                         <option value="weekend">Weekend</option>
                     </select>
                 </div>
+                    <button id="darkModeToggle">Toggle Dark Mode</button>
+                    <button onclick="exportToPDF()">Export as PDF</button>
+
             </div>
         </div>
 
@@ -96,6 +99,8 @@
     <script src="{{ url_for('static', filename='js/distanceViz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/satisfactionViz.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+
 </body>
 <footer style="text-align: center; padding: 10px; background-color: #f5f5f5;">
     Landmark information sourced and summarized with the help of ChatGPT.

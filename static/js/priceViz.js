@@ -28,9 +28,9 @@ function createPriceVisualization(data) {
     const statsDiv = containerDiv.append('div')
         .style('width', '200px')
         .style('padding', '10px')
-        .style('background-color', '#f8f9fa')
+        .style('background-color', 'var(--header-background)')
         .style('border-radius', '8px')
-        .style('border', '1px solid #dee2e6')
+        .style('border', '1px solid var(--box-shadow)')
         .style('height', 'fit-content');
 
     // Get container dimensions
@@ -102,7 +102,7 @@ function createPriceVisualization(data) {
             .attr('x2', x(city) + x.bandwidth())
             .attr('y1', y(stats.median))
             .attr('y2', y(stats.median))
-            .attr('stroke', 'black')
+            .attr('stroke', 'var(--text-color)')
             .attr('stroke-width', 2);
 
         // Whiskers
@@ -111,14 +111,14 @@ function createPriceVisualization(data) {
             .attr('x2', x(city) + x.bandwidth() / 2)
             .attr('y1', y(stats.min))
             .attr('y2', y(stats.q1))
-            .attr('stroke', 'black');
+            .attr('stroke', 'var(--text-color)');
 
         group.append('line')
             .attr('x1', x(city) + x.bandwidth() / 2)
             .attr('x2', x(city) + x.bandwidth() / 2)
             .attr('y1', y(stats.q3))
             .attr('y2', y(stats.max))
-            .attr('stroke', 'black');
+            .attr('stroke', 'var(--text-color)');
 
         // Whisker ends
         group.append('line')
@@ -126,14 +126,14 @@ function createPriceVisualization(data) {
             .attr('x2', x(city) + x.bandwidth() / 4 + x.bandwidth())
             .attr('y1', y(stats.min))
             .attr('y2', y(stats.min))
-            .attr('stroke', 'black');
+            .attr('stroke', 'var(--text-color)');
 
         group.append('line')
             .attr('x1', x(city) - x.bandwidth() / 4)
             .attr('x2', x(city) + x.bandwidth() / 4 + x.bandwidth())
             .attr('y1', y(stats.max))
             .attr('y2', y(stats.max))
-            .attr('stroke', 'black');
+            .attr('stroke', 'var(--text-color)');
     });
 
     // Add axes
@@ -143,25 +143,28 @@ function createPriceVisualization(data) {
         .selectAll('text')
         .attr('transform', 'rotate(-45)')
         .style('text-anchor', 'end')
-        .style('font-size', '12px');
+        .style('font-size', '12px')
+        .style('fill', 'var(--text-color)');
 
     svg.append('g')
         .call(d3.axisLeft(y)
             .tickFormat(d => `€${d}`)
             .ticks(5))
-        .style('font-size', '12px');
+        .style('font-size', '12px')
+        .style('fill', 'var(--text-color)');
 
     // Create and display statistics in stats container
     statsDiv.append('h3')
         .style('margin', '0 0 10px 0')
         .style('font-size', '14px')
-        .style('color', '#333')
+        .style('color', 'var(--text-color)')
         .text('Price Statistics');
 
     const statsContent = statsDiv.append('div')
         .attr('class', 'stats-content')
         .style('font-size', '13px')
-        .style('line-height', '1.4');
+        .style('line-height', '1.4')
+        .style('color', 'var(--text-color)');
 
     const initialCity = state.selectedCity || 'berlin';
     const initialStats = pricesByCity.get(initialCity);
@@ -175,30 +178,30 @@ function createPriceVisualization(data) {
     function updateStatsDisplay(city, stats) {
         statsContent.html(`
             <div style="margin-bottom: 15px">
-                <strong style="font-size: 16px; color: #2c3e50">
+                <strong style="font-size: 16px; color: var(--text-color)">
                     ${city.charAt(0).toUpperCase() + city.slice(1)}
                 </strong>
                 <br>
-                <span style="color: #666">Number of listings: ${stats.count}</span>
+                <span style="color: var(--text-color)">Number of listings: ${stats.count}</span>
             </div>
-            <table style="width: 100%; border-collapse: collapse;">
-                <tr style="border-bottom: 1px solid #dee2e6">
+            <table style="width: 100%; border-collapse: collapse; color: var(--text-color);">
+                <tr style="border-bottom: 1px solid var(--box-shadow)">
                     <td style="padding: 4px 0">Maximum:</td>
                     <td style="text-align: right">€${stats.max.toFixed(0)}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6">
+                <tr style="border-bottom: 1px solid var(--box-shadow)">
                     <td style="padding: 4px 0">Q3:</td>
                     <td style="text-align: right">€${stats.q3.toFixed(0)}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6; background-color: #e9ecef">
+                <tr style="border-bottom: 1px solid var(--box-shadow);">
                     <td style="padding: 4px 0"><strong>Median:</strong></td>
                     <td style="text-align: right"><strong>€${stats.median.toFixed(0)}</strong></td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6">
+                <tr style="border-bottom: 1px solid var(--box-shadow)">
                     <td style="padding: 4px 0">Q1:</td>
                     <td style="text-align: right">€${stats.q1.toFixed(0)}</td>
                 </tr>
-                <tr style="border-bottom: 1px solid #dee2e6">
+                <tr style="border-bottom: 1px solid var(--box-shadow)">
                     <td style="padding: 4px 0">Minimum:</td>
                     <td style="text-align: right">€${stats.min.toFixed(0)}</td>
                 </tr>
