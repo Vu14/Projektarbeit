@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AirBnB Analysis Dashboard</title>
+
+    <!-- Link to CSS Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+    <!-- Include D3.js Library -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Include Leaflet.js and CSS for geographic visualizations -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </head>
@@ -15,7 +21,10 @@
         <div class="header">
             <h1>AirBnB European Cities Analysis</h1>
             <p>Analyse pricing and satisfaction patterns across major European cities</p>
+            
+            <!-- Controls for user interaction -->
             <div class="header-controls">
+                <!-- Dropdown for city selection -->
                 <div class="control-group">
                     <label>City:</label>
                     <select id="citySelect" onchange="updateAllVisualizations()">
@@ -29,6 +38,8 @@
                         <option value="vienna">Vienna</option>
                     </select>
                 </div>
+
+                <!-- Dropdown for time period selection -->
                 <div class="control-group">
                     <label>Period:</label>
                     <select id="periodSelect" onchange="updateAllVisualizations()">
@@ -49,7 +60,7 @@
                 </div>
             </div>
 
-            <!-- Geographic Distribution -->
+            <!-- Geographic Distribution Visualization -->
             <div class="viz-container">
                 <h2 class="viz-title">Geographic Distribution</h2>
                 <div id="geoViz" class="loading">
@@ -57,7 +68,7 @@
                 </div>
             </div>
 
-            <!-- Satisfaction Analysis -->
+            <!-- Guest Satisfaction Analysis -->
             <div class="viz-container">
                 <h2 class="viz-title">Guest Experience Overview</h2>
                 <div id="satisfactionViz" class="loading">
@@ -72,15 +83,13 @@
                     Visualization loading...
                 </div>
             </div>
-
-           
         </div>
     </div>
 
     <!-- Tooltip for Distance Visualization -->
     <div id="distanceVizPopup" class="tooltip" style="opacity: 0; position: absolute;"></div>
 
-    <!-- Scripts -->
+    <!-- Include custom JavaScript files -->
     <script src="{{ url_for('static', filename='js/dataLoader.js') }}"></script>
     <script src="{{ url_for('static', filename='js/geoViz.js') }}"></script>
     <script src="{{ url_for('static', filename='js/priceViz.js') }}"></script>

@@ -3,11 +3,14 @@ import pandas as pd
 import os
 
 def create_database():
-    # Verbindung zur Datenbank herstellen
+    """
+    Function to create a SQLite database for Airbnb data and populate it from CSV files.
+    """
+    # Connect to the SQLite database (or create it if it doesn't exist)
     conn = sqlite3.connect('airbnb.db')
     cursor = conn.cursor()
 
-    # Tabelle erstellen
+    # Create the `listings` table if it doesn't already exist
     cursor.execute('''
     CREATE TABLE IF NOT EXISTS listings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,15 +30,16 @@ def create_database():
     )
     ''')
 
-    # Index für schnellere Abfragen
+    # Create an index on `city` and `period` for faster queries
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_city_period ON listings(city, period)')
 
-    # Daten importieren
+    # List of cities and periods to process
     cities = ['amsterdam', 'athens', 'barcelona', 'berlin', 
               'budapest', 'lisbon', 'london', 'paris', 
               'rome', 'vienna']
     periods = ['weekday', 'weekend']
 
+    # Import data from CSV files
     for city in cities:
         for period in periods:
             filename = f"{city}_{period}s.csv"
@@ -43,19 +47,20 @@ def create_database():
             
             if os.path.exists(filepath):
                 print(f"Importing {filename}...")
-                # CSV einlesen und unnötige Spalten entfernen
+
+                # Read the CSV file
                 df = pd.read_csv(filepath)
-                
-                # Entferne die Unnamed Spalte falls vorhanden
+
+                # Drop unnecessary "Unnamed" columns if they exist
                 columns_to_drop = [col for col in df.columns if 'Unnamed' in col]
                 if columns_to_drop:
                     df = df.drop(columns=columns_to_drop)
 
-                # Füge city und period hinzu
+                # Add `city` and `period` columns to the dataframe
                 df['city'] = city
                 df['period'] = period
 
-                # Stelle sicher, dass nur die benötigten Spalten in der richtigen Reihenfolge vorliegen
+                # Ensure the required columns are present and in the correct order
                 required_columns = [
                     'city', 'period', 'lat', 'lng', 'room_type', 
                     'person_capacity', 'realSum', 'guest_satisfaction_overall',
@@ -63,15 +68,15 @@ def create_database():
                     'attr_index', 'rest_index'
                 ]
 
-                # Prüfe ob alle erforderlichen Spalten vorhanden sind
+                # Fill missing columns with `None` if they are not present in the CSV
                 for col in required_columns:
                     if col not in df.columns:
-                        df[col] = None  # Fülle fehlende Spalten mit None
+                        df[col] = None
 
-                # Wähle nur die benötigten Spalten in der richtigen Reihenfolge
+                # Reorder the dataframe to match the required column order
                 df = df[required_columns]
 
-                # In die Datenbank schreiben
+                # Write the data to the database
                 try:
                     df.to_sql('listings', conn, if_exists='append', index=False)
                     print(f"Successfully imported {len(df)} rows from {filename}")
@@ -79,7 +84,7 @@ def create_database():
                     print(f"Error importing {filename}: {str(e)}")
                     continue
 
-    # Commit und Verbindung schließen
+    # Commit the transaction and close the database connection
     conn.commit()
     conn.close()
     print("Database creation completed!")
