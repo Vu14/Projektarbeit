@@ -99,7 +99,6 @@ function createSatisfactionVisualization(data) {
         .attr('stroke-dasharray', '2,2');
 
         // Add axis labels with values
-        // Add axis labels with values
         axes.append('g')
             .attr('transform', (d, i) => {
                 const angle = angleScale(i) - Math.PI / 2;
@@ -133,7 +132,7 @@ function createSatisfactionVisualization(data) {
                     .attr('dy', '-0.5em')
                     .style('font-weight', 'bold')
                     .style('font-size', '12px')
-                    .style('fill', 'var(--text-color)') // Dynamische Textfarbe
+                    .style('fill', 'var(--text-color)') 
                     .text(feature.label);
 
                 // Add value
@@ -142,7 +141,7 @@ function createSatisfactionVisualization(data) {
                     .attr('text-anchor', 'middle')
                     .attr('dy', '1em')
                     .style('font-size', '12px')
-                    .style('fill', 'var(--text-color)') // Dynamische Textfarbe auch für Werte
+                    .style('fill', 'var(--text-color)')
                     .text(displayValue);
             });
 

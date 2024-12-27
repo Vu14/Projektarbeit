@@ -107,47 +107,83 @@ function debounce(func, wait) {
     };
 }
 async function exportToPDF() {
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4'); // DIN A4 in Portrait-Modus
+    // Show loading overlay
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    loadingOverlay.style.display = 'flex';
 
-    const pageWidth = 210; // A4 Breite in mm
-    const pageHeight = 297; // A4 Höhe in mm
-    const margin = 10; // Ränder in mm
-    let yPosition = margin; // Startposition auf der Seite
+    try {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4'); // Create a PDF in DIN-A4 format
+        const pageWidth = 210; // Page width in mm
+        const pageHeight = 297; // Page height in mm
+        const margin = 10; // Margin
+        let yPosition = margin; // Starting position on the page
 
-    // Titel hinzufügen
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(16);
-    pdf.text('Dashboard Export', pageWidth / 2, yPosition, { align: 'center' });
-    yPosition += 10; // Abstand nach Titel
+        // Add title and description
+        pdf.setFont('helvetica', 'bold');
+        pdf.setFontSize(16);
+        pdf.text('AirBnB European Cities Analysis', pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 10;
 
-    // HTML-Elemente auswählen und in Bilder umwandeln
-    const charts = document.querySelectorAll('.chart-container'); // Passe den Selektor an deine Diagramme an
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(12);
+        pdf.text('Analyse pricing and satisfaction patterns across major European cities', pageWidth / 2, yPosition, { align: 'center' });
+        yPosition += 10;
 
-    for (let i = 0; i < charts.length; i++) {
-        const chart = charts[i];
+        // Export charts as images
+        const vizGrid = document.querySelector('.viz-grid');
+        const vizContainers = vizGrid.querySelectorAll('.viz-container');
 
-        // Diagramm als Bild umwandeln
-        const canvas = await html2canvas(chart); // Verwende html2canvas für Screenshot
-        const imgData = canvas.toDataURL('image/png');
+        for (const container of vizContainers) {
+            // Convert chart to image using html2canvas
+            const canvas = await html2canvas(container);
+            const imgData = canvas.toDataURL('image/png');
 
-        // Verhältnis berechnen
-        const imgWidth = pageWidth - 2 * margin;
-        const imgHeight = (canvas.height / canvas.width) * imgWidth;
+            // Calculate image dimensions and aspect ratio
+            const imgWidth = pageWidth - 2 * margin;
+            const imgHeight = (canvas.height / canvas.width) * imgWidth;
 
-        // Bild hinzufügen
-        if (yPosition + imgHeight > pageHeight - margin) {
-            pdf.addPage(); // Neue Seite hinzufügen, wenn Platz nicht reicht
-            yPosition = margin;
+            // Add a new page if there's not enough space
+            if (yPosition + imgHeight > pageHeight - margin) {
+                pdf.addPage();
+                yPosition = margin;
+            }
+
+            // Add chart title
+            const title = container.querySelector('.viz-title').textContent;
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(14);
+            pdf.text(title, margin, yPosition + 5);
+            yPosition += 10;
+
+            // Add the chart image
+            pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
+            yPosition += imgHeight + 10;
         }
 
-        pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
-        yPosition += imgHeight + 10; // Abstand nach dem Bild
-    }
+        // Add footer note
+        pdf.setFont('helvetica', 'italic');
+        pdf.setFontSize(10);
+        pdf.text(
+            'Landmark information sourced and summarized with the help of ChatGPT.',
+            pageWidth / 2,
+            pageHeight - margin,
+            { align: 'center' }
+        );
 
-    // PDF herunterladen
-    pdf.save('dashboard-export.pdf');
+        // Save the PDF file
+        pdf.save('AirBnB_Analysis.pdf');
+    } catch (error) {
+        console.error('Error during PDF export:', error);
+        alert('An error occurred during the export. Please try again.');
+    } finally {
+        // Hide loading overlay
+        loadingOverlay.style.display = 'none';
+    }
 }
+
+
+
 
 // Export state globally if needed for debugging or external modules
 window.dashboardState = state;
