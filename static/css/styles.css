@@ -244,3 +244,20 @@ select {
         transform: rotate(360deg);
     }
 }
+
+
+/* Splitview specific styles */
+.split-view .viz-grid {
+    grid-template-columns: repeat(4, 1fr); /* Für zwei Städte nebeneinander */
+}
+
+#citySelect2, #splitViewToggle {
+    display: block; /* Sicherstellen, dass die neuen Elemente sichtbar sind */
+}
+
+@media (max-width: 1200px) {
+    .split-view .viz-grid {
+        grid-template-columns: repeat(2, 1fr); /* Kleinere Ansicht */
+    }
+}
+

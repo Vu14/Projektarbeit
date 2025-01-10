@@ -13,9 +13,9 @@ if (localStorage.getItem('darkMode') === 'true') {
  * Function to create a satisfaction visualization using a radar chart.
  * @param {Array} data - Array of data points to visualize.
  */
-function createSatisfactionVisualization(data) {
+function createSatisfactionVisualization(data,plot) {
     // Container setup
-    const containerDiv = d3.select('#satisfactionViz')
+    const containerDiv = d3.select(plot)
         .classed('loading', false)
         .html('');
 

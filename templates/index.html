@@ -54,9 +54,27 @@
                         <option value="weekend">Weekend</option>
                     </select>
                 </div>
+
                     <button id="darkModeToggle">Toggle Dark Mode</button>
                     <button onclick="exportToPDF()">Export as PDF</button>
 
+                    <div class="control-group">
+                        <label>City 2:</label>
+                        <select id="citySelect2" onchange="updateAllVisualizations()">                       
+                            <option value="amsterdam">Amsterdam</option>
+                            <option value="paris">Paris</option>
+                            <option value="athens">Athens</option>
+                            <option value="budapest">Budapest</option>
+                            <option value="lisbon">Lisbon</option>
+                            <option value="rome">Rome</option>
+                            <option value="vienna">Vienna</option>
+                            <option value="berlin">Berlin</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label>Enable Splitview:</label>
+                        <input type="checkbox" id="splitViewToggle" onchange="toggleSplitView()">
+                    </div>
             </div>
         </div>
 
@@ -69,11 +87,23 @@
                     Visualization loading...
                 </div>
             </div>
+            <div class="viz-container" id="split-container1" style="display: none;">
+                <h2 class="viz-title">Price Distribution2</h2>
+                <div id="priceViz2" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
 
             <!-- Geographic Distribution Visualization -->
             <div class="viz-container">
                 <h2 class="viz-title">Geographic Distribution</h2>
                 <div id="geoViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+            <div class="viz-container" id="split-container2" style="display: none;">
+                <h2 class="viz-title">Geographic Distribution2</h2>
+                <div id="geoViz2" class="loading">
                     Visualization loading...
                 </div>
             </div>
@@ -85,11 +115,23 @@
                     Visualization loading...
                 </div>
             </div>
+            <div class="viz-container" id="split-container3" style="display: none;">
+                <h2 class="viz-title">Guest Experience Overview2</h2>
+                <div id="satisfactionViz2" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
 
             <!-- Distance vs Price Analysis -->
             <div class="viz-container">
                 <h2 class="viz-title">Distance vs Price Analysis</h2>
                 <div id="distanceViz" class="loading">
+                    Visualization loading...
+                </div>
+            </div>
+            <div class="viz-container" id="split-container4" style="display: none;">
+                <h2 class="viz-title">Distance vs Price Analysis2</h2>
+                <div id="distanceViz2" class="loading">
                     Visualization loading...
                 </div>
             </div>

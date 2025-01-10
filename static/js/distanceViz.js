@@ -1,8 +1,8 @@
 let distanceVizContext = null;
 
-function createDistancePriceVisualization(data) {
+function createDistancePriceVisualization(data,plot) {
     // Container Setup
-    const containerDiv = d3.select('#distanceViz')
+    const containerDiv = d3.select(plot)
         .classed('loading', false)
         .html(''); // Clear previous visualizations
 

@@ -1,8 +1,11 @@
 // Global state to manage dashboard data and selections
 let state = {
     currentData: null, // Holds the current dataset
+    secondData: null, // Holds the second dataset
     selectedCity: 'berlin', // Default city
+    selectedCity2: 'amsterdam', // Splitview default city
     selectedPeriod: 'weekday', // Default time period
+    splitView: false, // Tracks if splitview is enabled
     isLoading: true // Tracks the loading state
 };
 
@@ -19,16 +22,34 @@ async function initializeDashboard() {
 
         const data = await loadData(); // Fetch data
         state.currentData = data; // Store data in state
+
+        const data2 = await loadData2(); // Fetch data
+        state.secondData = data2; // Store data in state
         
         // Set initial values for dropdowns
         document.getElementById('citySelect').value = state.selectedCity;
+        document.getElementById('citySelect2').value = state.selectedCity2;
         document.getElementById('periodSelect').value = state.selectedPeriod;
 
         // Initialize all visualizations
-        createGeoVisualization(data);
-        createPriceVisualization(data);
-        createDistancePriceVisualization(data); 
-        createSatisfactionVisualization(data);
+        if (state.splitView) {
+            createPriceVisualization(data, "#priceViz");
+            createPriceVisualization(data2, "#priceViz2");
+            createGeoVisualization(data,"#geoViz");
+            createGeoVisualization(data2,"#geoViz2");
+            createSatisfactionVisualization(data,"#satisfactionViz");
+            createSatisfactionVisualization(data2,"#satisfactionViz2");
+            createDistancePriceVisualization(data,"#distanceViz"); 
+            createDistancePriceVisualization(data2,"#distanceViz2"); 
+            
+        } else {
+            createGeoVisualization(data, "#geoViz");
+            createPriceVisualization(data, "#priceViz");
+            createDistancePriceVisualization(data,"#distanceViz"); 
+            createSatisfactionVisualization(data, "#satisfactionViz");
+        }
+
+        
 
         state.isLoading = false; // Update loading state
 
@@ -43,15 +64,29 @@ async function initializeDashboard() {
 async function updateAllVisualizations() {
     try {
         state.selectedCity = document.getElementById('citySelect').value;
+        state.selectedCity2 = document.getElementById('citySelect2').value;
         state.selectedPeriod = document.getElementById('periodSelect').value;
         
         const newData = await loadData(); // Fetch updated data
+        const newData2 = await loadData2(); // Fetch updated data
         
         // Update all visualizations with new data
-        updateGeoVisualization(newData, state.selectedCity);
-        updatePriceVisualization(newData);
-        updateDistancePriceVisualization(filterData()); // Filtered data for distance visualization
-        updateSatisfactionVisualization(newData);
+        if (state.splitView) {
+            updatePriceVisualization(newData, "#priceViz");
+            updatePriceVisualization(newData2, "#priceViz2");
+            updateGeoVisualization(newData, "#geoViz");
+            updateGeoVisualization(newData2, "#geoViz2");
+            updateSatisfactionVisualization(newData, "#satisfactionViz");
+            updateSatisfactionVisualization(newData2, "#satisfactionViz2");
+            updateDistancePriceVisualization(newData, "#distanceViz"); 
+            updateDistancePriceVisualization(newData2, "#distanceViz2"); 
+
+        } else {
+            updateGeoVisualization(newData, "#geoViz");
+            updatePriceVisualization(newData, "#priceViz");
+            updateDistancePriceVisualization(newData, "#distanceViz"); 
+            updateSatisfactionVisualization(newData, "#satisfactionViz");
+        }
 
     } catch (error) {
         handleError('Error updating visualizations: ' + error.message);
@@ -181,6 +216,33 @@ async function exportToPDF() {
         loadingOverlay.style.display = 'none';
     }
 }
+
+
+function toggleSplitView() {
+    const isChecked = document.getElementById('splitViewToggle').checked;
+    state.splitView = isChecked;
+    
+
+    if (state.splitView) {
+        document.getElementById('split-container1').style.display = 'block';
+        document.getElementById('split-container2').style.display = 'block';
+        document.getElementById('split-container3').style.display = 'block';
+        document.getElementById('split-container4').style.display = 'block';
+        document.getElementsByClassName('split-container').style.display = 'block';
+        console.log("splitview enabled");
+    } else {
+        document.getElementById('split-container1').style.display = 'none';
+        document.getElementById('split-container2').style.display = 'none';
+        document.getElementById('split-container3').style.display = 'none';
+        document.getElementById('split-container4').style.display = 'none';
+        document.getElementsByClassName('split-container').style.display = 'none';
+        console.log("splitview disabled");
+    }
+
+    updateAllVisualizations();
+}
+
+
 
 
 

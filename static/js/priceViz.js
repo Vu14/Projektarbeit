@@ -4,13 +4,13 @@ let resizeTimeout;
  * Function to create a price visualization using D3.js.
  * @param {Array} data - Array of data points to visualize.
  */
-function createPriceVisualization(data) {
+function createPriceVisualization(data, plot) {
     // Filter extreme outliers
     const maxPrice = 1000;
     data = data.filter(d => d.realSum <= maxPrice);
 
     // Container setup
-    const containerDiv = d3.select('#priceViz')
+    const containerDiv = d3.select(plot)
         .classed('loading', false)
         .html('')
         .style('display', 'flex')
@@ -226,6 +226,6 @@ function createPriceVisualization(data) {
  * Function to update the price visualization with new data.
  * @param {Array} data - Array of data points to visualize.
  */
-function updatePriceVisualization(data) {
-    createPriceVisualization(data);
+function updatePriceVisualization(data,plot) {
+    createPriceVisualization(data,plot);
 }

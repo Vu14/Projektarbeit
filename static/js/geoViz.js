@@ -4,7 +4,7 @@ let geoVizContext = null;
  * Function to create the Geo Visualization with initial setup.
  * @param {Array} data - Data points to visualize.
  */
-function createGeoVisualization(data) {
+function createGeoVisualization(data,plot) {
     const cityConfig = {
         'berlin': {
             center: [52.52, 13.405],
@@ -49,7 +49,7 @@ function createGeoVisualization(data) {
     };
 
     // Create and configure the map container
-    const container = d3.select('#geoViz')
+    const container = d3.select(plot)
         .classed('loading', false)
         .html('');
 
