@@ -33,17 +33,19 @@
 
 ## Overview of Functions
 
-- **Data Visualization**
-  - Various charts and graphs to visualize your data.
-  - Interactive elements to filter and explore data.
+### Data Visualization
+- **Create Visualization:** Initializes a geographical visualization based on the provided data. This function is used to create maps that display data points based on geographic locations.
+- **Update Visualization:** Updates the existing visualizations based on user selections or new data inputs. This function ensures that the visualizations reflect the most current data and user preferences.
 
-- **Data Management**
-  - Upload and manage your datasets.
-  - View and edit data entries.
+### Data Management
+- **Upload Datasets:** You can upload your datasets in CSV format through the dashboard interface. The system will validate the data and provide feedback if there are any issues.
+- **View Data Entries:** The dashboard allows you to view the data entries in a tabular format. You can sort and filter the data to find specific entries.
+- **Edit Data Entries:** If you need to make changes to your data, you can edit the entries directly within the dashboard. This feature ensures that your data is always up-to-date.
 
-- **User Interaction**
-  - Interactive dashboard elements for better user experience.
-  - Customizable views and settings.
+### User Interaction
+- **Interactive Filters:** Apply filters to your data visualizations to focus on specific subsets of data. This helps in analyzing particular segments without distraction.
+- **Customizable Views:** Adjust the settings of your visualizations to suit your preferences. You can change the chart types, colors, and other display options.
+- **Tooltips and Annotations:** Hover over data points to see additional information. You can also add annotations to highlight important insights.
 
 ## Presentation Slides
 
