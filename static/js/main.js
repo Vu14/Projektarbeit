@@ -165,7 +165,7 @@ async function exportToPDF() {
         pdf.setFont('helvetica', 'italic');
         pdf.setFontSize(10);
         pdf.text(
-            'Landmark information sourced and summarized with the help of ChatGPT.',
+            'This PDF was generated using the AirBnB Analysis Dashboard',
             pageWidth / 2,
             pageHeight - margin,
             { align: 'center' }
